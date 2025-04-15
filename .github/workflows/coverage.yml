@@ -7,6 +7,8 @@ on:
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,4 +35,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: ./coverage # 배포할 폴더 경로
-          branch: main # 배포할 브랜치 (일반적으로 gh-pages 사용)
+          branch: coverage # 배포할 브랜치 (일반적으로 gh-pages 사용)
