@@ -8,9 +8,18 @@ export default defineConfig({
     environment: "node",
     coverage: {
       reporter: ["text", "html"],
-      include: ["dist/**/*.{ts,tsx}"],
+      include: ["dist/**/*.{cjs,js,ts,cts}"],
       exclude: ["**/__tests__/**", "**/*.test.ts", "src/*"],
       reportsDirectory: "./coverage",
+    },
+  },
+  resolve: {
+    conditions: ["import", "require"],
+  },
+  build: {
+    lib: {
+      entry: "./src/index.ts",
+      name: "subflow",
     },
   },
 });
