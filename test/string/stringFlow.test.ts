@@ -1,4 +1,4 @@
-import { stringFlow } from "../../src/string/stringFlow";
+import { stringFlow } from "@build/index.cjs";
 import { describe, it, expect } from "vitest";
 
 describe("stringFlow", () => {

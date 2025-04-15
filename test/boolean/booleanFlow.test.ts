@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { booleanFlow } from "../../dist";
+import { booleanFlow } from "@build/index.cjs";
 
 describe("booleanFlow", () => {
   describe("기본 기능", () => {

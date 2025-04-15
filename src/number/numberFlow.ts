@@ -5,8 +5,10 @@ import { FlowError } from "@subflow/error";
 import { safer } from "@subflow/utils";
 import { NumberFlowMethods } from "@subflow/types/flows";
 
-console.log(stringFlow);
-export const numberFlow = <M extends Methods<number>>(value: number, methods?: M) => {
+export const numberFlow = <M extends Methods<number>>(
+  value: number,
+  methods?: M
+) => {
   const defaultMethods: NumberFlowMethods = {
     add(this: FlowReturn<number>, num: number) {
       return numberFlow(this.get() + num);
@@ -65,7 +67,11 @@ export const numberFlow = <M extends Methods<number>>(value: number, methods?: M
     toPrecision(this: FlowReturn<number>, precision?: number) {
       return stringFlow(this.get().toPrecision(precision));
     },
-    flowLocaleString(this: FlowReturn<number>, locales: string | string[], options?: Intl.NumberFormatOptions) {
+    flowLocaleString(
+      this: FlowReturn<number>,
+      locales: string | string[],
+      options?: Intl.NumberFormatOptions
+    ) {
       return stringFlow(this.get().toLocaleString(locales, options));
     },
     flowString(this: FlowReturn<number>, radix?: number) {
@@ -82,8 +88,18 @@ export const numberFlow = <M extends Methods<number>>(value: number, methods?: M
 
       return value;
     },
-    new FlowError("number", value, "Value must be a number", "NUMBER_FLOW_ERROR", Date.now(), "traceId")
+    new FlowError(
+      "number",
+      value,
+      "Value must be a number",
+      "NUMBER_FLOW_ERROR",
+      Date.now(),
+      "traceId"
+    )
   );
 
-  return createFlow(init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow(
+    init,
+    methods ? { ...defaultMethods, ...methods } : defaultMethods
+  );
 };

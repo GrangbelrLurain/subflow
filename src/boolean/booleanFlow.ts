@@ -7,9 +7,10 @@ import { FlowError } from "@subflow/error";
 import { safer } from "@subflow/utils";
 import { BooleanFlowMethods } from "@subflow/types/flows";
 
-console.log(stringFlow, numberFlow);
-
-export const booleanFlow = <E extends Methods<FlowReturn<boolean>>>(value: boolean, methods?: E) => {
+export const booleanFlow = <E extends Methods<FlowReturn<boolean>>>(
+  value: boolean,
+  methods?: E
+) => {
   if (typeof value !== "boolean") {
     throw createError({
       type: "boolean",
@@ -71,10 +72,20 @@ export const booleanFlow = <E extends Methods<FlowReturn<boolean>>>(value: boole
 
       return value;
     },
-    new FlowError("boolean", value, "Value must be a boolean", "BOOLEAN_FLOW_ERROR", Date.now(), "traceId")
+    new FlowError(
+      "boolean",
+      value,
+      "Value must be a boolean",
+      "BOOLEAN_FLOW_ERROR",
+      Date.now(),
+      "traceId"
+    )
   );
 
-  return createFlow<boolean, typeof defaultMethods>(init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow<boolean, typeof defaultMethods>(
+    init,
+    methods ? { ...defaultMethods, ...methods } : defaultMethods
+  );
 };
 
 export default booleanFlow;

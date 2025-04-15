@@ -7,7 +7,10 @@ export default defineConfig({
     globals: true,
     environment: "node",
     coverage: {
-      reporter: ["text", "json", "html"],
+      reporter: ["text", "html"],
+      include: ["dist/**/*.{ts,tsx}"],
+      exclude: ["**/__tests__/**", "**/*.test.ts", "src/*"],
+      reportsDirectory: "./coverage",
     },
   },
 });

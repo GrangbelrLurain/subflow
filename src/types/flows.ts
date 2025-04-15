@@ -7,10 +7,22 @@ export type StringFlowMethods = {
   toLower(this: FlowReturn<string>): StringFlowReturn;
   length(this: FlowReturn<string>): number;
   reverse(this: FlowReturn<string>): StringFlowReturn;
-  replace<S extends string | RegExp, R extends string>(this: FlowReturn<string>, searchValue: S, replaceValue: R): StringFlowReturn;
+  replace<S extends string | RegExp, R extends string>(
+    this: FlowReturn<string>,
+    searchValue: S,
+    replaceValue: R
+  ): StringFlowReturn;
   trim(this: FlowReturn<string>): StringFlowReturn;
-  padStart(this: FlowReturn<string>, length: number, fillString?: string): StringFlowReturn;
-  padEnd(this: FlowReturn<string>, length: number, fillString?: string): StringFlowReturn;
+  padStart(
+    this: FlowReturn<string>,
+    length: number,
+    fillString?: string
+  ): StringFlowReturn;
+  padEnd(
+    this: FlowReturn<string>,
+    length: number,
+    fillString?: string
+  ): StringFlowReturn;
   startsWith(this: FlowReturn<string>, searchString: string): boolean;
   endsWith(this: FlowReturn<string>, searchString: string): boolean;
   includes(this: FlowReturn<string>, searchString: string): boolean;
@@ -19,10 +31,25 @@ export type StringFlowMethods = {
   charAt(this: FlowReturn<string>, index: number): string;
   charCodeAt(this: FlowReturn<string>, index: number): number;
   concat(this: FlowReturn<string>, ...strings: string[]): StringFlowReturn;
-  split<S extends string | RegExp>(this: FlowReturn<string>, separator: S): string[];
-  slice(this: FlowReturn<string>, start?: number, end?: number): StringFlowReturn;
-  substring(this: FlowReturn<string>, start: number, end?: number): StringFlowReturn;
-  substr(this: FlowReturn<string>, start: number, length?: number): StringFlowReturn;
+  split<S extends string | RegExp>(
+    this: FlowReturn<string>,
+    separator: S
+  ): string[];
+  slice(
+    this: FlowReturn<string>,
+    start?: number,
+    end?: number
+  ): StringFlowReturn;
+  substring(
+    this: FlowReturn<string>,
+    start: number,
+    end?: number
+  ): StringFlowReturn;
+  substr(
+    this: FlowReturn<string>,
+    start: number,
+    length?: number
+  ): StringFlowReturn;
   flowNumber(this: FlowReturn<string>): NumberFlowReturn;
   flowFloatNumber(this: FlowReturn<string>): NumberFlowReturn;
   flowBoolean(this: FlowReturn<string>): BooleanFlowReturn;
@@ -53,7 +80,11 @@ export type NumberFlowMethods = {
   toExponential(this: FlowReturn<number>, digits?: number): StringFlowReturn;
   toPrecision(this: FlowReturn<number>, precision?: number): StringFlowReturn;
   flowString(this: FlowReturn<number>, radix?: number): StringFlowReturn;
-  flowLocaleString(this: FlowReturn<number>, locales: string | string[], options?: Intl.NumberFormatOptions): StringFlowReturn;
+  flowLocaleString(
+    this: FlowReturn<number>,
+    locales: string | string[],
+    options?: Intl.NumberFormatOptions
+  ): StringFlowReturn;
 };
 
 export type BooleanFlowReturn = BooleanFlowMethods & FlowReturn<boolean>;
@@ -67,7 +98,10 @@ export type BooleanFlowMethods = {
   equal(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
   greaterThan(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
   lessThan(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
-  greaterThanOrEqual(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
+  greaterThanOrEqual(
+    this: FlowReturn<boolean>,
+    other: boolean
+  ): BooleanFlowReturn;
   lessThanOrEqual(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
   flowString(this: FlowReturn<boolean>): StringFlowReturn;
   flowNumber(this: FlowReturn<boolean>): NumberFlowReturn;
@@ -75,30 +109,92 @@ export type BooleanFlowMethods = {
 
 export type ElementOf<T> = T extends (infer E)[] ? E : never;
 
-export type ArrayFlowReturn<T extends any[]> = ArrayFlowMethods<ElementOf<T>[]> & FlowReturn<ElementOf<T>[]>;
+export type ArrayFlowReturn<T extends any[]> = ArrayFlowMethods<
+  ElementOf<T>[]
+> &
+  FlowReturn<ElementOf<T>[]>;
 
 export type ArrayFlowMethods<T extends any[]> = {
-  push(this: FlowReturn<T>, ...items: ElementOf<T>[]): ArrayFlowReturn<ElementOf<T>[]>;
+  push(
+    this: FlowReturn<T>,
+    ...items: ElementOf<T>[]
+  ): ArrayFlowReturn<ElementOf<T>[]>;
   pop(this: FlowReturn<T>): ArrayFlowReturn<ElementOf<T>[]>;
   shift(this: FlowReturn<T>): ArrayFlowReturn<ElementOf<T>[]>;
-  unshift(this: FlowReturn<T>, ...items: ElementOf<T>[]): ArrayFlowReturn<ElementOf<T>[]>;
+  unshift(
+    this: FlowReturn<T>,
+    ...items: ElementOf<T>[]
+  ): ArrayFlowReturn<ElementOf<T>[]>;
   join(this: FlowReturn<T>, separator: string): StringFlowReturn;
-  map<U>(this: FlowReturn<T>, callback: (value: ElementOf<T>, index: number, array: T) => U): ArrayFlowReturn<U[]>;
-  filter(this: FlowReturn<T>, callback: (value: ElementOf<T>, index: number, array: T) => boolean): ArrayFlowReturn<ElementOf<T>[]>;
-  reduce(this: FlowReturn<T>, callback: (acc: ElementOf<T>, value: ElementOf<T>, index: number, array: T) => ElementOf<T>, initialValue: ElementOf<T>): ElementOf<T>;
-  sort(this: FlowReturn<T>, compareFunction?: (a: ElementOf<T>, b: ElementOf<T>) => number): ArrayFlowReturn<ElementOf<T>[]>;
+  map<U>(
+    this: FlowReturn<T>,
+    callback: (value: ElementOf<T>, index: number, array: T) => U
+  ): ArrayFlowReturn<U[]>;
+  filter(
+    this: FlowReturn<T>,
+    callback: (value: ElementOf<T>, index: number, array: T) => boolean
+  ): ArrayFlowReturn<ElementOf<T>[]>;
+  reduce(
+    this: FlowReturn<T>,
+    callback: (
+      acc: ElementOf<T>,
+      value: ElementOf<T>,
+      index: number,
+      array: T
+    ) => ElementOf<T>,
+    initialValue: ElementOf<T>
+  ): ElementOf<T>;
+  sort(
+    this: FlowReturn<T>,
+    compareFunction?: (a: ElementOf<T>, b: ElementOf<T>) => number
+  ): ArrayFlowReturn<ElementOf<T>[]>;
   reverse(this: FlowReturn<T>): ArrayFlowReturn<ElementOf<T>[]>;
   concat(this: FlowReturn<T>, ...arrays: T[]): ArrayFlowReturn<ElementOf<T>[]>;
-  slice(this: FlowReturn<T>, start: number, end: number): ArrayFlowReturn<ElementOf<T>[]>;
-  splice(this: FlowReturn<T>, start: number, deleteCount: number, ...items: ElementOf<T>[]): ArrayFlowReturn<ElementOf<T>[]>;
-  indexOf(this: FlowReturn<T>, searchElement: ElementOf<T>, fromIndex?: number): NumberFlowReturn;
-  lastIndexOf(this: FlowReturn<T>, searchElement: ElementOf<T>, fromIndex?: number): NumberFlowReturn;
-  includes(this: FlowReturn<T>, searchElement: ElementOf<T>, fromIndex?: number): BooleanFlowReturn;
-  find(this: FlowReturn<T>, callback: (value: ElementOf<T>, index: number, array: T) => boolean): ElementOf<T>;
-  findIndex(this: FlowReturn<T>, callback: (value: ElementOf<T>, index: number, array: T) => boolean): NumberFlowReturn;
-  forEach(this: FlowReturn<T>, callback: (value: ElementOf<T>, index: number, array: T) => void): ArrayFlowReturn<ElementOf<T>[]>;
-  every(this: FlowReturn<T>, callback: (value: ElementOf<T>, index: number, array: T) => boolean): BooleanFlowReturn;
-  some(this: FlowReturn<T>, callback: (value: ElementOf<T>, index: number, array: T) => boolean): BooleanFlowReturn;
+  slice(
+    this: FlowReturn<T>,
+    start: number,
+    end: number
+  ): ArrayFlowReturn<ElementOf<T>[]>;
+  splice(
+    this: FlowReturn<T>,
+    start: number,
+    deleteCount: number,
+    ...items: ElementOf<T>[]
+  ): ArrayFlowReturn<ElementOf<T>[]>;
+  indexOf(
+    this: FlowReturn<T>,
+    searchElement: ElementOf<T>,
+    fromIndex?: number
+  ): NumberFlowReturn;
+  findLastIndex(
+    this: FlowReturn<T>,
+    searchElement: ElementOf<T>
+  ): NumberFlowReturn;
+  includes(
+    this: FlowReturn<T>,
+    searchElement: ElementOf<T>,
+    fromIndex?: number
+  ): BooleanFlowReturn;
+  find(
+    this: FlowReturn<T>,
+    callback: (value: ElementOf<T>, index: number, array: T) => boolean
+  ): ElementOf<T>;
+  findIndex(
+    this: FlowReturn<T>,
+    callback: (value: ElementOf<T>, index: number, array: T) => boolean
+  ): NumberFlowReturn;
+  forEach(
+    this: FlowReturn<T>,
+    callback: (value: ElementOf<T>, index: number, array: T) => void
+  ): ArrayFlowReturn<ElementOf<T>[]>;
+  every(
+    this: FlowReturn<T>,
+    callback: (value: ElementOf<T>, index: number, array: T) => boolean
+  ): BooleanFlowReturn;
+  some(
+    this: FlowReturn<T>,
+    callback: (value: ElementOf<T>, index: number, array: T) => boolean
+  ): BooleanFlowReturn;
   flowString(this: FlowReturn<T>): StringFlowReturn;
   flowLocaleString(this: FlowReturn<T>): StringFlowReturn;
   flowStringfy(this: FlowReturn<T>): StringFlowReturn;
@@ -107,13 +203,20 @@ export type ArrayFlowMethods<T extends any[]> = {
   flowNumber(this: FlowReturn<T>): NumberFlowReturn;
 };
 
-export type ObjectFlowReturn = ObjectFlowMethods & FlowReturn<Record<string, any>>;
+export type ObjectFlowReturn = ObjectFlowMethods &
+  FlowReturn<Record<string, any>>;
 
 export type ObjectFlowMethods = {
   keys(this: FlowReturn<Record<string, any>>): ArrayFlowReturn<string[]>;
   values(this: FlowReturn<Record<string, any>>): ArrayFlowReturn<any[]>;
-  entries(this: FlowReturn<Record<string, any>>): ArrayFlowReturn<[string, any][]>;
+  entries(
+    this: FlowReturn<Record<string, any>>
+  ): ArrayFlowReturn<[string, any][]>;
   has(this: FlowReturn<Record<string, any>>, key: string): BooleanFlowReturn;
-  set(this: FlowReturn<Record<string, any>>, key: string, value: any): ObjectFlowReturn;
+  set(
+    this: FlowReturn<Record<string, any>>,
+    key: string,
+    value: any
+  ): ObjectFlowReturn;
   delete(this: FlowReturn<Record<string, any>>, key: string): ObjectFlowReturn;
 };

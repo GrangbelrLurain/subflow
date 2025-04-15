@@ -1,0 +1,29 @@
+name: Generate Coverage & Deploy
+
+on:
+  push:
+    branches: [main] # 또는 원하는 브랜치
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: pnpm install
+
+      - name: Run tests with coverage
+        run: pnpm test:coverage
+
+      - name: Deploy to GitHub Pages
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: ./coverage

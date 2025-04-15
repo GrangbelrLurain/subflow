@@ -1,5 +1,5 @@
-import { safer } from "../../src/utils/safer";
-import { FlowError } from "../../src/error/FlowError";
+import { safer } from "@build/index.cjs";
+import { FlowError } from "@build/index.cjs";
 import { describe, it, expect } from "vitest";
 
 describe("safer", () => {
@@ -12,7 +12,14 @@ describe("safer", () => {
         }
         return value;
       };
-      const errorFallback = new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
+      const errorFallback = new FlowError(
+        "string",
+        value,
+        "Value error",
+        "TEST_ERROR",
+        Date.now(),
+        "traceId"
+      );
 
       const result = safer(value, validator, errorFallback);
       expect(result).toBe("test value");
@@ -28,7 +35,14 @@ describe("safer", () => {
         }
         return value;
       };
-      const errorFallback = new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
+      const errorFallback = new FlowError(
+        "string",
+        value,
+        "Value error",
+        "TEST_ERROR",
+        Date.now(),
+        "traceId"
+      );
 
       const result = safer(value, validator, errorFallback);
       expect(result).toBe(errorFallback);
@@ -42,7 +56,14 @@ describe("safer", () => {
         }
         return value;
       };
-      const errorFallback = new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
+      const errorFallback = new FlowError(
+        "string",
+        value,
+        "Value error",
+        "TEST_ERROR",
+        Date.now(),
+        "traceId"
+      );
 
       const result = safer(value, validator, errorFallback);
       expect(result).toBe(errorFallback);
@@ -58,7 +79,14 @@ describe("safer", () => {
         }
         return value;
       };
-      const errorFallback = new FlowError("number", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
+      const errorFallback = new FlowError(
+        "number",
+        value,
+        "Value error",
+        "TEST_ERROR",
+        Date.now(),
+        "traceId"
+      );
 
       const result = safer(value, validator, errorFallback);
       expect(result).toBe(42);
@@ -72,7 +100,14 @@ describe("safer", () => {
         }
         return value;
       };
-      const errorFallback = new FlowError("boolean", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
+      const errorFallback = new FlowError(
+        "boolean",
+        value,
+        "Value error",
+        "TEST_ERROR",
+        Date.now(),
+        "traceId"
+      );
 
       const result = safer(value, validator, errorFallback);
       expect(result).toBe(true);
@@ -86,7 +121,14 @@ describe("safer", () => {
         }
         return value;
       };
-      const errorFallback = new FlowError("object", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
+      const errorFallback = new FlowError(
+        "object",
+        value,
+        "Value error",
+        "TEST_ERROR",
+        Date.now(),
+        "traceId"
+      );
 
       const result = safer(value, validator, errorFallback);
       expect(result).toEqual({ name: "Test" });
