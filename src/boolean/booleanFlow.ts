@@ -1,12 +1,15 @@
 import { createFlow } from "@subflow/core/createFlow";
 import { numberFlow } from "@subflow/number";
 import { stringFlow } from "@subflow/string";
-import { Extensions } from "@subflow/types/core";
+import { Methods, FlowReturn } from "@subflow/types/core";
 import { createError } from "@subflow/error";
 import { FlowError } from "@subflow/error";
 import { safer } from "@subflow/utils";
+import { BooleanFlowMethods } from "@subflow/types/flows";
 
-export const booleanFlow = <T extends boolean, E extends Extensions<E>>(value: T, extensions?: E) => {
+console.log(stringFlow, numberFlow);
+
+export const booleanFlow = <E extends Methods<FlowReturn<boolean>>>(value: boolean, methods?: E) => {
   if (typeof value !== "boolean") {
     throw createError({
       type: "boolean",
@@ -20,51 +23,48 @@ export const booleanFlow = <T extends boolean, E extends Extensions<E>>(value: T
     });
   }
 
-  type Flow = { get: () => T };
-
-  const methods = {
-    not(this: Flow) {
-      return booleanFlow(!this.get());
+  const defaultMethods: BooleanFlowMethods = {
+    not(this: FlowReturn<boolean>) {
+      return booleanFlow(!this.get(), methods);
     },
-    and(this: Flow, other: boolean) {
-      return booleanFlow(this.get() && other);
+    and(this: FlowReturn<boolean>, other: boolean) {
+      return booleanFlow(this.get() && other, methods);
     },
-    or(this: Flow, other: boolean) {
-      return booleanFlow(this.get() || other);
+    or(this: FlowReturn<boolean>, other: boolean) {
+      return booleanFlow(this.get() || other, methods);
     },
-    xor(this: Flow, other: boolean) {
-      return booleanFlow(this.get() !== other);
+    xor(this: FlowReturn<boolean>, other: boolean) {
+      return booleanFlow(this.get() !== other, methods);
     },
-    notEqual(this: Flow, other: boolean) {
-      return booleanFlow(this.get() !== other);
+    notEqual(this: FlowReturn<boolean>, other: boolean) {
+      return booleanFlow(this.get() !== other, methods);
     },
-    equal(this: Flow, other: boolean) {
-      return booleanFlow(this.get() === other);
+    equal(this: FlowReturn<boolean>, other: boolean) {
+      return booleanFlow(this.get() === other, methods);
     },
-    greaterThan(this: Flow, other: boolean) {
-      return booleanFlow(this.get() > other);
+    greaterThan(this: FlowReturn<boolean>, other: boolean) {
+      return booleanFlow(this.get() > other, methods);
     },
-    lessThan(this: Flow, other: boolean) {
-      return booleanFlow(this.get() < other);
+    lessThan(this: FlowReturn<boolean>, other: boolean) {
+      return booleanFlow(this.get() < other, methods);
     },
-    greaterThanOrEqual(this: Flow, other: boolean) {
-      return booleanFlow(this.get() >= other);
+    greaterThanOrEqual(this: FlowReturn<boolean>, other: boolean) {
+      return booleanFlow(this.get() >= other, methods);
     },
-    lessThanOrEqual(this: Flow, other: boolean) {
-      return booleanFlow(this.get() <= other);
+    lessThanOrEqual(this: FlowReturn<boolean>, other: boolean) {
+      return booleanFlow(this.get() <= other, methods);
     },
-    toString(this: Flow) {
+    flowString(this: FlowReturn<boolean>) {
       return stringFlow(this.get().toString());
     },
-    toNumber(this: Flow) {
+    flowNumber(this: FlowReturn<boolean>) {
       return numberFlow(this.get() ? 1 : 0);
     },
-    ...(extensions || {}),
-  } as const;
+  };
 
   const init = safer(
     value,
-    (value: T): T => {
+    (value: boolean): boolean => {
       if (typeof value !== "boolean") {
         throw new Error("Value must be a boolean");
       }
@@ -74,7 +74,7 @@ export const booleanFlow = <T extends boolean, E extends Extensions<E>>(value: T
     new FlowError("boolean", value, "Value must be a boolean", "BOOLEAN_FLOW_ERROR", Date.now(), "traceId")
   );
 
-  return createFlow<T, typeof methods>(init, methods);
+  return createFlow<boolean, typeof defaultMethods>(init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
 };
 
 export default booleanFlow;

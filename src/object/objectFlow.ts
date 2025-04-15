@@ -1,39 +1,35 @@
 import { arrayFlow } from "@subflow/array";
 import { booleanFlow } from "@subflow/boolean";
 import { createFlow } from "@subflow/core";
-import { Extensions } from "@subflow/types/core";
+import { Methods, FlowReturn } from "@subflow/types/core";
 import { FlowError } from "@subflow/error";
 import { safer } from "@subflow/utils";
+import { ObjectFlowMethods } from "@subflow/types/flows";
 
-export const objectFlow = <T extends Record<string, unknown>, E extends Extensions<E>>(value: T, extensions?: E) => {
-  type Flow = { get: () => T };
-
-  const methods = {
-    keys(this: Flow) {
+export const objectFlow = <T extends Record<string, unknown>, E extends Methods<T>>(value: T, extensions?: E) => {
+  const methods: ObjectFlowMethods = {
+    keys(this: FlowReturn<T>) {
       return arrayFlow(Object.keys(this.get()));
     },
-    values(this: Flow) {
+    values(this: FlowReturn<T>) {
       return arrayFlow(Object.values(this.get()));
     },
-    entries(this: Flow) {
+    entries(this: FlowReturn<T>) {
       return arrayFlow(Object.entries(this.get()));
     },
-    has(this: Flow, key: string) {
+    has(this: FlowReturn<T>, key: string) {
       return booleanFlow(this.get().hasOwnProperty(key));
     },
-    get(this: Flow, key: string) {
-      return this.get()[key];
-    },
-    set(this: Flow, key: string, value: unknown) {
+    set(this: FlowReturn<T>, key: string, value: unknown) {
       return objectFlow({ ...this.get(), [key]: value }, extensions);
     },
-    delete(this: Flow, key: string) {
+    delete(this: FlowReturn<T>, key: string) {
       const newObj = { ...this.get() };
       delete newObj[key];
       return objectFlow(newObj, extensions);
     },
     ...(extensions || {}),
-  } as const;
+  };
 
   const init = safer(
     value,
@@ -49,5 +45,3 @@ export const objectFlow = <T extends Record<string, unknown>, E extends Extensio
 
   return createFlow<T, typeof methods>(init, methods);
 };
-
-export default objectFlow;

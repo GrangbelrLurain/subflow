@@ -10,7 +10,8 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@subflow/*": ["src/*"]
+      "@subflow/*": ["src/*"],
+      "@build/*": ["dist/*"]
     }
   },
   "include": ["src", "test"],

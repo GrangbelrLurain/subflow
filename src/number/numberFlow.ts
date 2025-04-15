@@ -1,82 +1,81 @@
 import { createFlow } from "@subflow/core/createFlow";
 import { stringFlow } from "@subflow/string/stringFlow";
-import { Extensions } from "@subflow/types/core";
+import { Methods, FlowReturn } from "@subflow/types/core";
 import { FlowError } from "@subflow/error";
 import { safer } from "@subflow/utils";
+import { NumberFlowMethods } from "@subflow/types/flows";
 
-export const numberFlow = <T extends number, E extends Extensions<E>>(value: T, extensions?: E) => {
-  type Flow = { get: () => T };
-
-  const methods = {
-    add(this: Flow, num: number) {
+console.log(stringFlow);
+export const numberFlow = <M extends Methods<number>>(value: number, methods?: M) => {
+  const defaultMethods: NumberFlowMethods = {
+    add(this: FlowReturn<number>, num: number) {
       return numberFlow(this.get() + num);
     },
-    subtract(this: Flow, num: number) {
+    subtract(this: FlowReturn<number>, num: number) {
       return numberFlow(this.get() - num);
     },
-    multiply(this: Flow, num: number) {
+    multiply(this: FlowReturn<number>, num: number) {
       return numberFlow(this.get() * num);
     },
-    divide(this: Flow, num: number) {
+    divide(this: FlowReturn<number>, num: number) {
       return numberFlow(this.get() / num);
     },
-    modulo(this: Flow, num: number) {
+    modulo(this: FlowReturn<number>, num: number) {
       return numberFlow(this.get() % num);
     },
-    power(this: Flow, num: number) {
+    power(this: FlowReturn<number>, num: number) {
       return numberFlow(this.get() ** num);
     },
-    sqrt(this: Flow) {
+    sqrt(this: FlowReturn<number>) {
       return numberFlow(Math.sqrt(this.get()));
     },
-    round(this: Flow) {
+    round(this: FlowReturn<number>) {
       return numberFlow(Math.round(this.get()));
     },
-    floor(this: Flow) {
+    floor(this: FlowReturn<number>) {
       return numberFlow(Math.floor(this.get()));
     },
-    ceil(this: Flow) {
+    ceil(this: FlowReturn<number>) {
       return numberFlow(Math.ceil(this.get()));
     },
-    abs(this: Flow) {
+    abs(this: FlowReturn<number>) {
       return numberFlow(Math.abs(this.get()));
     },
-    random(this: Flow) {
+    random(this: FlowReturn<number>) {
       return numberFlow(Math.random());
     },
-    min(this: Flow, num: number) {
+    min(this: FlowReturn<number>, num: number) {
       return numberFlow(Math.min(this.get(), num));
     },
-    max(this: Flow, num: number) {
+    max(this: FlowReturn<number>, num: number) {
       return numberFlow(Math.max(this.get(), num));
     },
-    clamp(this: Flow, min: number, max: number) {
+    clamp(this: FlowReturn<number>, min: number, max: number) {
       return numberFlow(Math.min(Math.max(this.get(), min), max));
     },
-    sign(this: Flow) {
+    sign(this: FlowReturn<number>) {
       return numberFlow(Math.sign(this.get()));
     },
-    toFixed(this: Flow, digits: number) {
-      return numberFlow(Number(this.get().toFixed(digits)));
+    toFixed(this: FlowReturn<number>, digits?: number) {
+      return stringFlow(this.get().toFixed(digits));
     },
-    toExponential(this: Flow, digits: number) {
-      return numberFlow(Number(this.get().toExponential(digits)));
+    toExponential(this: FlowReturn<number>, digits?: number) {
+      return stringFlow(this.get().toExponential(digits));
     },
-    toPrecision(this: Flow, precision: number) {
-      return numberFlow(Number(this.get().toPrecision(precision)));
+    toPrecision(this: FlowReturn<number>, precision?: number) {
+      return stringFlow(this.get().toPrecision(precision));
     },
-    toLocaleString(this: Flow, locales: string | string[], options?: Intl.NumberFormatOptions) {
+    flowLocaleString(this: FlowReturn<number>, locales: string | string[], options?: Intl.NumberFormatOptions) {
       return stringFlow(this.get().toLocaleString(locales, options));
     },
-    toString(this: Flow, radix?: number) {
+    flowString(this: FlowReturn<number>, radix?: number) {
       return stringFlow(this.get().toString(radix));
     },
-    ...(extensions || {}),
-  } as const;
+  };
 
   const init = safer(
     value,
-    (value: T): T => {
+    (value: number): number => {
       if (typeof value !== "number") {
         throw new Error("Value must be a number");
       }
@@ -86,5 +85,5 @@ export const numberFlow = <T extends number, E extends Extensions<E>>(value: T, 
     new FlowError("number", value, "Value must be a number", "NUMBER_FLOW_ERROR", Date.now(), "traceId")
   );
 
-  return createFlow<T, typeof methods>(init, methods);
+  return createFlow(init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
 };

@@ -1,25 +1,34 @@
 import { FlowError } from "@subflow/error";
 
-export type Extensions<E extends Record<string, unknown>> = {
-  [K in keyof E]: (...args: [E[K]]) => FlowReturn<E[K], E>;
-};
+/**
+ * 단일 확장 메서드의 타입 정의
+ * @template T 확장 메서드가 적용될 객체 타입
+ * @template Args 메서드 인자들의 타입
+ * @template Return 메서드 반환값의 타입
+ */
+export type Method<T, Args extends any[] = any[], Return = any> = (this: DefaultExtensions<T>, ...args: Args) => Return;
 
-export type SafeFlow<T, E extends Record<string, unknown>> = {
-  get: () => T;
-  getError: () => undefined;
-  isError: () => false;
-} & E;
+/**
+ * 확장 메서드들의 컬렉션 타입 정의
+ * @template T 확장 메서드들이 적용될 객체 타입
+ * @template EM 확장 메서드들의 맵 타입 (선택적)
+ */
+export type Methods<T, EM extends Record<string, Method<T>> = Record<string, Method<T>>> = EM;
 
-export type ErrorFlow<T, E extends Record<string, unknown>> = {
-  get: () => T;
-  getError: () => FlowError<T>;
-  isError: () => true;
-} & E;
+export type DefaultExtensions<T> =
+  | {
+      get: () => T;
+      getError: () => FlowError<T>;
+      isError: () => true;
+    }
+  | {
+      get: () => T;
+      getError: () => undefined;
+      isError: () => false;
+    };
 
-export type FlowReturn<T, E extends Record<string, unknown>> = SafeFlow<T, E> | ErrorFlow<T, E>;
+export type FlowReturn<T> = DefaultExtensions<T>;
 
-export type Flow<T, E extends Extensions<E>> = (value: T, extensions?: E) => FlowReturn<T, E>;
+export type Flow<T> = (value: T) => FlowReturn<T>;
 
 export type FlowType = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "array";
-
-export type FlowMethod<T, E extends Extensions<E>> = (flow: (...args: any[]) => (value: T) => FlowReturn<T, E>) => FlowReturn<T, E>;

@@ -1,6 +1,6 @@
 import { FlowError } from "@subflow/error";
 
-export const safer = <T>(value: T, validate: (value: T) => T, error: FlowError<T>) => {
+export const safer = <T>(value: T, validate: (value: T) => T, error: FlowError<T>): T | FlowError<T> => {
   try {
     return validate(value);
   } catch (e) {
