@@ -226,7 +226,16 @@
 <a name='L161'></a><a href='#L161'>161</a>
 <a name='L162'></a><a href='#L162'>162</a>
 <a name='L163'></a><a href='#L163'>163</a>
-<a name='L164'></a><a href='#L164'>164</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -389,19 +398,34 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">declare const createError: &lt;T extends FlowError&lt;T&gt;&gt;(error: T) =&gt; FlowError&lt;T&gt;;
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">declare const IS_FLOW_ERROR: unique symbol;
+declare const errorFlow: &lt;T, M extends Methods&lt;T&gt; = {}&gt;(error: FlowErrorParams&lt;T&gt;) =&gt; FlowReturn&lt;T&gt; &amp; M;
+declare function isError&lt;T&gt;(flow: any): flow is ErrorFlow&lt;T&gt;;
 &nbsp;
-declare class FlowError&lt;T extends any&gt; {
-    type: FlowType;
-    value: T;
-    message: string;
-    code: string;
-    timestamp: number;
-    traceId: string;
-    stack?: string | undefined;
-    cause?: Error | undefined;
-    constructor(type: FlowType, value: T, message: string, code: string, timestamp: number, traceId: string, stack?: string | undefined, cause?: Error | undefined);
+interface FlowErrorParams&lt;T&gt; {
+    readonly type: FlowType;
+    readonly value: T;
+    readonly message: string;
+    readonly code: string;
+    readonly timestamp?: number;
+    readonly traceId?: string;
+    readonly stack?: string;
+    readonly cause?: Error;
 }
+type ErrorFlow&lt;T&gt; = {
+    isError: typeof IS_FLOW_ERROR;
+    getError: () =&gt; FlowErrorParams&lt;T&gt;;
+    get: () =&gt; T;
+};
 &nbsp;
 /**
  * 단일 확장 메서드의 타입 정의
@@ -418,13 +442,9 @@ type Method&lt;T, Args extends any[] = any[], Return = any&gt; = (this: DefaultE
 type Methods&lt;T, EM extends Record&lt;string, Method&lt;T&gt;&gt; = Record&lt;string, Method&lt;T&gt;&gt;&gt; = EM;
 type DefaultExtensions&lt;T&gt; = {
     get: () =&gt; T;
-    getError: () =&gt; FlowError&lt;T&gt;;
-    isError: () =&gt; true;
-} | {
-    get: () =&gt; T;
     getError: () =&gt; undefined;
-    isError: () =&gt; false;
-};
+    isError: false;
+} | ErrorFlow&lt;T&gt;;
 type FlowReturn&lt;T&gt; = DefaultExtensions&lt;T&gt;;
 type Flow&lt;T&gt; = (value: T) =&gt; FlowReturn&lt;T&gt;;
 type FlowType = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "array";
@@ -433,21 +453,21 @@ type StringFlowReturn = StringFlowMethods &amp; FlowReturn&lt;string&gt;;
 type StringFlowMethods = {
     toUpper(this: FlowReturn&lt;string&gt;): StringFlowReturn;
     toLower(this: FlowReturn&lt;string&gt;): StringFlowReturn;
-    length(this: FlowReturn&lt;string&gt;): number;
+    length(this: FlowReturn&lt;string&gt;): NumberFlowReturn;
     reverse(this: FlowReturn&lt;string&gt;): StringFlowReturn;
     replace&lt;S extends string | RegExp, R extends string&gt;(this: FlowReturn&lt;string&gt;, searchValue: S, replaceValue: R): StringFlowReturn;
     trim(this: FlowReturn&lt;string&gt;): StringFlowReturn;
     padStart(this: FlowReturn&lt;string&gt;, length: number, fillString?: string): StringFlowReturn;
     padEnd(this: FlowReturn&lt;string&gt;, length: number, fillString?: string): StringFlowReturn;
-    startsWith(this: FlowReturn&lt;string&gt;, searchString: string): boolean;
-    endsWith(this: FlowReturn&lt;string&gt;, searchString: string): boolean;
-    includes(this: FlowReturn&lt;string&gt;, searchString: string): boolean;
-    indexOf(this: FlowReturn&lt;string&gt;, searchString: string): number;
-    lastIndexOf(this: FlowReturn&lt;string&gt;, searchString: string): number;
-    charAt(this: FlowReturn&lt;string&gt;, index: number): string;
-    charCodeAt(this: FlowReturn&lt;string&gt;, index: number): number;
+    startsWith(this: FlowReturn&lt;string&gt;, searchString: string): BooleanFlowReturn;
+    endsWith(this: FlowReturn&lt;string&gt;, searchString: string): BooleanFlowReturn;
+    includes(this: FlowReturn&lt;string&gt;, searchString: string): BooleanFlowReturn;
+    indexOf(this: FlowReturn&lt;string&gt;, searchString: string): NumberFlowReturn;
+    lastIndexOf(this: FlowReturn&lt;string&gt;, searchString: string): NumberFlowReturn;
+    charAt(this: FlowReturn&lt;string&gt;, index: number): StringFlowReturn;
+    charCodeAt(this: FlowReturn&lt;string&gt;, index: number): NumberFlowReturn;
     concat(this: FlowReturn&lt;string&gt;, ...strings: string[]): StringFlowReturn;
-    split&lt;S extends string | RegExp&gt;(this: FlowReturn&lt;string&gt;, separator: S): string[];
+    split&lt;S extends string | RegExp&gt;(this: FlowReturn&lt;string&gt;, separator: S): ArrayFlowReturn&lt;string[]&gt;;
     slice(this: FlowReturn&lt;string&gt;, start?: number, end?: number): StringFlowReturn;
     substring(this: FlowReturn&lt;string&gt;, start: number, end?: number): StringFlowReturn;
     substr(this: FlowReturn&lt;string&gt;, start: number, length?: number): StringFlowReturn;
@@ -506,7 +526,7 @@ type ArrayFlowMethods&lt;T extends any[]&gt; = {
     join(this: FlowReturn&lt;T&gt;, separator: string): StringFlowReturn;
     map&lt;U&gt;(this: FlowReturn&lt;T&gt;, callback: (value: ElementOf&lt;T&gt;, index: number, array: T) =&gt; U): ArrayFlowReturn&lt;U[]&gt;;
     filter(this: FlowReturn&lt;T&gt;, callback: (value: ElementOf&lt;T&gt;, index: number, array: T) =&gt; boolean): ArrayFlowReturn&lt;ElementOf&lt;T&gt;[]&gt;;
-    reduce(this: FlowReturn&lt;T&gt;, callback: (acc: ElementOf&lt;T&gt;, value: ElementOf&lt;T&gt;, index: number, array: T) =&gt; ElementOf&lt;T&gt;, initialValue: ElementOf&lt;T&gt;): ElementOf&lt;T&gt;;
+    reduce&lt;U&gt;(this: FlowReturn&lt;T&gt;, callback: (acc: ElementOf&lt;T&gt;, value: ElementOf&lt;T&gt;, index: number, array: T) =&gt; U, initialValue: U): U;
     sort(this: FlowReturn&lt;T&gt;, compareFunction?: (a: ElementOf&lt;T&gt;, b: ElementOf&lt;T&gt;) =&gt; number): ArrayFlowReturn&lt;ElementOf&lt;T&gt;[]&gt;;
     reverse(this: FlowReturn&lt;T&gt;): ArrayFlowReturn&lt;ElementOf&lt;T&gt;[]&gt;;
     concat(this: FlowReturn&lt;T&gt;, ...arrays: T[]): ArrayFlowReturn&lt;ElementOf&lt;T&gt;[]&gt;;
@@ -524,6 +544,7 @@ type ArrayFlowMethods&lt;T extends any[]&gt; = {
     flowLocaleString(this: FlowReturn&lt;T&gt;): StringFlowReturn;
     flowStringfy(this: FlowReturn&lt;T&gt;): StringFlowReturn;
     flowObject(this: FlowReturn&lt;T&gt;): ObjectFlowReturn;
+    flowObjectEntries(this: FlowReturn&lt;T&gt;): ObjectFlowReturn;
     flowBoolean(this: FlowReturn&lt;T&gt;): BooleanFlowReturn;
     flowNumber(this: FlowReturn&lt;T&gt;): NumberFlowReturn;
 };
@@ -535,23 +556,29 @@ type ObjectFlowMethods = {
     has(this: FlowReturn&lt;Record&lt;string, any&gt;&gt;, key: string): BooleanFlowReturn;
     set(this: FlowReturn&lt;Record&lt;string, any&gt;&gt;, key: string, value: any): ObjectFlowReturn;
     delete(this: FlowReturn&lt;Record&lt;string, any&gt;&gt;, key: string): ObjectFlowReturn;
+    flowString(this: FlowReturn&lt;Record&lt;string, any&gt;&gt;): StringFlowReturn;
+};
+type FlowErrorReturn&lt;T&gt; = FlowErrorMethods&lt;T&gt; &amp; FlowReturn&lt;T&gt;;
+type FlowErrorMethods&lt;T&gt; = {
+    getError(this: FlowReturn&lt;T&gt;): FlowErrorParams&lt;T&gt;;
+    isError(this: FlowReturn&lt;T&gt;): true;
 };
 &nbsp;
 declare const arrayFlow: &lt;T extends any[], M extends Methods&lt;any[]&gt;&gt;(value: T, methods?: M) =&gt; FlowReturn&lt;T&gt; &amp; ArrayFlowMethods&lt;any[]&gt;;
 &nbsp;
-declare const booleanFlow: &lt;E extends Methods&lt;FlowReturn&lt;boolean&gt;&gt;&gt;(value: boolean, methods?: E) =&gt; FlowReturn&lt;boolean&gt; &amp; BooleanFlowMethods;
+declare const booleanFlow: &lt;E extends Methods&lt;boolean&gt;&gt;(value: boolean, methods?: E) =&gt; FlowReturn&lt;boolean&gt; &amp; BooleanFlowMethods;
 &nbsp;
-declare const createFlow: &lt;T extends any, E extends Methods&lt;T&gt; = {}&gt;(init: T | FlowError&lt;T&gt;, extensions?: E) =&gt; FlowReturn&lt;T&gt; &amp; E;
+declare const createFlow: &lt;T extends any, E extends Methods&lt;T&gt; = {}&gt;(init: T, methods?: E) =&gt; FlowReturn&lt;T&gt; &amp; E;
 &nbsp;
 declare const numberFlow: &lt;M extends Methods&lt;number&gt;&gt;(value: number, methods?: M) =&gt; FlowReturn&lt;number&gt; &amp; NumberFlowMethods;
 &nbsp;
-declare const objectFlow: &lt;T extends Record&lt;string, unknown&gt;, E extends Methods&lt;T&gt;&gt;(value: T, extensions?: E) =&gt; FlowReturn&lt;T&gt; &amp; ObjectFlowMethods;
+declare const objectFlow: &lt;T extends object, M extends Methods&lt;T&gt;&gt;(value: T, methods?: M) =&gt; FlowReturn&lt;T&gt; &amp; ObjectFlowMethods;
 &nbsp;
 declare const stringFlow: &lt;M extends Methods&lt;string&gt;&gt;(value: string, methods?: M) =&gt; FlowReturn&lt;string&gt; &amp; StringFlowMethods;
 &nbsp;
-declare const safer: &lt;T&gt;(value: T, validate: (value: T) =&gt; T, error: FlowError&lt;T&gt;) =&gt; T | FlowError&lt;T&gt;;
+declare const safer: &lt;T, M extends Methods&lt;T&gt; = {}&gt;(value: T, validate: (value: T) =&gt; T, error: FlowErrorParams&lt;T&gt;) =&gt; T | (FlowReturn&lt;T&gt; &amp; M);
 &nbsp;
-export { type ArrayFlowMethods, type ArrayFlowReturn, type BooleanFlowMethods, type BooleanFlowReturn, type DefaultExtensions, type ElementOf, type Flow, FlowError, type FlowReturn, type FlowType, type Method, type Methods, type NumberFlowMethods, type NumberFlowReturn, type ObjectFlowMethods, type ObjectFlowReturn, type StringFlowMethods, type StringFlowReturn, arrayFlow, booleanFlow, createError, createFlow, numberFlow, objectFlow, safer, stringFlow };
+export { type ArrayFlowMethods, type ArrayFlowReturn, type BooleanFlowMethods, type BooleanFlowReturn, type DefaultExtensions, type ElementOf, type Flow, type FlowErrorMethods, type FlowErrorReturn, type FlowReturn, type FlowType, IS_FLOW_ERROR, type Method, type Methods, type NumberFlowMethods, type NumberFlowReturn, type ObjectFlowMethods, type ObjectFlowReturn, type StringFlowMethods, type StringFlowReturn, arrayFlow, booleanFlow, createFlow, errorFlow, isError, numberFlow, objectFlow, safer, stringFlow };
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -559,7 +586,7 @@ export { type ArrayFlowMethods, type ArrayFlowReturn, type BooleanFlowMethods, t
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-04-15T23:30:50.702Z
+                at 2025-04-16T23:37:09.139Z
             </div>
         <script src="prettify.js"></script>
         <script>
