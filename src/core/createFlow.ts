@@ -3,21 +3,15 @@ import { FlowReturn, Methods } from "@subflow/types/core";
 
 export const createFlow = <T extends any, E extends Methods<T> = {}>(init: T, methods?: E) => {
   const flowMonad = Object.create({
+    ...(methods || {}),
     get(this: { _value: T }) {
       return this._value;
     },
-    ...(methods || {}),
-  });
-
-  if (methods && !("isError" in methods)) {
-    flowMonad.isError = false;
-  }
-
-  if (methods && !("getError" in methods)) {
-    flowMonad.getError = function (this: { _value: T }) {
+    isError: false,
+    getError(this: { _value: T }) {
       return undefined;
-    };
-  }
+    },
+  });
 
   return Object.create(flowMonad, {
     _value: {
