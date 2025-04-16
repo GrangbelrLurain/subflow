@@ -2,13 +2,16 @@ import { createFlow } from "@subflow/core/createFlow";
 import { FlowReturn, Methods } from "@subflow/types/core";
 import { booleanFlow } from "@subflow/boolean";
 import { safer } from "@subflow/utils";
-import { FlowError } from "@subflow/error";
 import { numberFlow } from "@subflow/number";
 import { arrayFlow } from "@subflow/array";
 import { objectFlow } from "@subflow/object";
 import { StringFlowMethods } from "@subflow/types/flows";
+import { isError } from "@subflow/error";
 
-export const stringFlow = <M extends Methods<string>>(value: string, methods?: M) => {
+export const stringFlow = <M extends Methods<string>>(
+  value: string,
+  methods?: M
+) => {
   const defaultMethods: StringFlowMethods = {
     toUpper(this: FlowReturn<string>) {
       return stringFlow(this.get().toUpperCase(), methods);
@@ -17,12 +20,16 @@ export const stringFlow = <M extends Methods<string>>(value: string, methods?: M
       return stringFlow(this.get().toLowerCase(), methods);
     },
     length(this: FlowReturn<string>) {
-      return this.get().length;
+      return numberFlow(this.get().length);
     },
     reverse(this: FlowReturn<string>) {
       return stringFlow(this.get().split("").reverse().join(""), methods);
     },
-    replace<S extends string | RegExp, R extends string>(this: FlowReturn<string>, searchValue: S, replaceValue: R) {
+    replace<S extends string | RegExp, R extends string>(
+      this: FlowReturn<string>,
+      searchValue: S,
+      replaceValue: R
+    ) {
       return stringFlow(this.get().replace(searchValue, replaceValue), methods);
     },
     trim(this: FlowReturn<string>) {
@@ -35,31 +42,31 @@ export const stringFlow = <M extends Methods<string>>(value: string, methods?: M
       return stringFlow(this.get().padEnd(length, fillString), methods);
     },
     startsWith(this: FlowReturn<string>, searchString: string) {
-      return this.get().startsWith(searchString);
+      return booleanFlow(this.get().startsWith(searchString));
     },
     endsWith(this: FlowReturn<string>, searchString: string) {
-      return this.get().endsWith(searchString);
+      return booleanFlow(this.get().endsWith(searchString));
     },
     includes(this: FlowReturn<string>, searchString: string) {
-      return this.get().includes(searchString);
+      return booleanFlow(this.get().includes(searchString));
     },
     indexOf(this: FlowReturn<string>, searchString: string) {
-      return this.get().indexOf(searchString);
+      return numberFlow(this.get().indexOf(searchString));
     },
     lastIndexOf(this: FlowReturn<string>, searchString: string) {
-      return this.get().lastIndexOf(searchString);
+      return numberFlow(this.get().lastIndexOf(searchString));
     },
     charAt(this: FlowReturn<string>, index: number) {
-      return this.get().charAt(index);
+      return stringFlow(this.get().charAt(index), methods);
     },
     charCodeAt(this: FlowReturn<string>, index: number) {
-      return this.get().charCodeAt(index);
+      return numberFlow(this.get().charCodeAt(index));
     },
     concat(this: FlowReturn<string>, ...strings: string[]) {
       return stringFlow(this.get().concat(...strings), methods);
     },
     split<S extends string | RegExp>(this: FlowReturn<string>, separator: S) {
-      return this.get().split(separator);
+      return arrayFlow(this.get().split(separator));
     },
     slice(this: FlowReturn<string>, start?: number, end?: number) {
       return stringFlow(this.get().slice(start, end), methods);
@@ -87,7 +94,7 @@ export const stringFlow = <M extends Methods<string>>(value: string, methods?: M
     },
   };
 
-  const init = safer(
+  const init = safer<string, M & typeof defaultMethods>(
     value,
     (value: string): string => {
       if (typeof value !== "string") {
@@ -96,8 +103,22 @@ export const stringFlow = <M extends Methods<string>>(value: string, methods?: M
 
       return value;
     },
-    new FlowError("string", value, "Value must be a string", "STRING_FLOW_ERROR", Date.now(), "traceId")
+    {
+      type: "string",
+      value,
+      message: "Value must be a string",
+      code: "STRING_FLOW_ERROR",
+      timestamp: Date.now(),
+      traceId: crypto.randomUUID(),
+    }
   );
 
-  return createFlow(init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  if (isError(init)) {
+    return init;
+  }
+
+  return createFlow(
+    init as string,
+    methods ? { ...defaultMethods, ...methods } : defaultMethods
+  );
 };

@@ -2,28 +2,14 @@ import { createFlow } from "@subflow/core/createFlow";
 import { numberFlow } from "@subflow/number";
 import { stringFlow } from "@subflow/string";
 import { Methods, FlowReturn } from "@subflow/types/core";
-import { createError } from "@subflow/error";
-import { FlowError } from "@subflow/error";
 import { safer } from "@subflow/utils";
 import { BooleanFlowMethods } from "@subflow/types/flows";
+import { isError } from "@subflow/error";
 
-export const booleanFlow = <E extends Methods<FlowReturn<boolean>>>(
+export const booleanFlow = <E extends Methods<boolean>>(
   value: boolean,
   methods?: E
 ) => {
-  if (typeof value !== "boolean") {
-    throw createError({
-      type: "boolean",
-      value,
-      code: "BOOLEAN_FLOW_ERROR",
-      message: "Value must be a boolean",
-      stack: new Error().stack,
-      cause: new Error("Value must be a boolean"),
-      timestamp: Date.now(),
-      traceId: "traceId",
-    });
-  }
-
   const defaultMethods: BooleanFlowMethods = {
     not(this: FlowReturn<boolean>) {
       return booleanFlow(!this.get(), methods);
@@ -63,7 +49,7 @@ export const booleanFlow = <E extends Methods<FlowReturn<boolean>>>(
     },
   };
 
-  const init = safer(
+  const init = safer<boolean, E & typeof defaultMethods>(
     value,
     (value: boolean): boolean => {
       if (typeof value !== "boolean") {
@@ -72,18 +58,20 @@ export const booleanFlow = <E extends Methods<FlowReturn<boolean>>>(
 
       return value;
     },
-    new FlowError(
-      "boolean",
+    {
+      type: "boolean",
       value,
-      "Value must be a boolean",
-      "BOOLEAN_FLOW_ERROR",
-      Date.now(),
-      "traceId"
-    )
+      message: "Value must be a boolean",
+      code: "BOOLEAN_FLOW_ERROR",
+    }
   );
 
+  if (isError(init)) {
+    return init;
+  }
+
   return createFlow<boolean, typeof defaultMethods>(
-    init,
+    init as boolean,
     methods ? { ...defaultMethods, ...methods } : defaultMethods
   );
 };

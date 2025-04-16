@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { arrayFlow as ArrayFlow } from "@subflow/array";
-import { arrayFlow as ArrayFlowJS } from "@build/index.js";
-import { arrayFlow as ArrayFlowESM } from "@build/index.cjs";
+import { arrayFlow as ArrayFlowJS, isError as isErrorJS } from "@build/index.js";
+import { arrayFlow as ArrayFlowESM, isError as isErrorESM } from "@build/index.cjs";
 
-const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
+const testArrayFlow = (arrayFlow: typeof ArrayFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
   describe("arrayFlow", () => {
     describe("기본 기능", () => {
       it("배열 값을 가진 flow를 생성해야 합니다", () => {
@@ -15,7 +15,7 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
       it("오류가 없을 때 isError가 false를 반환해야 합니다", () => {
         const arr = [1, 2, 3];
         const flow = arrayFlow(arr);
-        expect(flow.isError()).toBe(false);
+        expect(isError(flow)).toBe(false);
       });
     });
 
@@ -60,6 +60,8 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const arr = ["a", "b", "c"];
         const flow = arrayFlow(arr);
         expect(flow.join("-").get()).toBe("a-b-c");
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual(["a", "b", "c"]);
       });
 
       it("map: 배열의 각 요소에 함수를 적용해야 합니다", () => {
@@ -85,6 +87,8 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const flow = arrayFlow(arr);
         const result = flow.reduce((acc, val) => acc + val, 0);
         expect(result).toBe(10);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3, 4]);
       });
 
       it("sort: 배열을 정렬해야 합니다", () => {
@@ -137,6 +141,8 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const flow = arrayFlow(arr);
         expect(flow.indexOf(2).get()).toBe(1);
         expect(flow.indexOf(5).get()).toBe(-1);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3, 2, 4]);
       });
 
       it("findLastIndex: 요소의 마지막 인덱스를 찾아야 합니다", () => {
@@ -144,6 +150,8 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const flow = arrayFlow(arr);
         expect(flow.findLastIndex(2).get()).toBe(3);
         expect(flow.findLastIndex(5).get()).toBe(-1);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3, 2, 4]);
       });
 
       it("includes: 배열에 요소가 포함되어 있는지 확인해야 합니다", () => {
@@ -151,6 +159,8 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const flow = arrayFlow(arr);
         expect(flow.includes(3).get()).toBe(true);
         expect(flow.includes(6).get()).toBe(false);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3, 4, 5]);
       });
 
       it("find: 조건에 맞는 첫 번째 요소를 찾아야 합니다", () => {
@@ -158,6 +168,8 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const flow = arrayFlow(arr);
         expect(flow.find((x) => x > 3)).toBe(4);
         expect(flow.find((x) => x > 5)).toBeUndefined();
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3, 4, 5]);
       });
 
       it("findIndex: 조건에 맞는 첫 번째 요소의 인덱스를 찾아야 합니다", () => {
@@ -165,6 +177,8 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const flow = arrayFlow(arr);
         expect(flow.findIndex((x) => x > 3).get()).toBe(3);
         expect(flow.findIndex((x) => x > 5).get()).toBe(-1);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3, 4, 5]);
       });
 
       it("forEach: 각 요소에 대해 함수를 실행해야 합니다", () => {
@@ -185,6 +199,9 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const arr2 = [2, 3, 4, 6];
         const flow2 = arrayFlow(arr2);
         expect(flow2.every((x) => x % 2 === 0).get()).toBe(false);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([2, 4, 6, 8]);
+        expect(flow2.get()).toEqual([2, 3, 4, 6]);
       });
 
       it("some: 하나 이상의 요소가 조건을 만족하는지 확인해야 합니다", () => {
@@ -195,6 +212,9 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const arr2 = [1, 2, 3, 5];
         const flow2 = arrayFlow(arr2);
         expect(flow2.some((x) => x % 2 === 0).get()).toBe(true);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 3, 5, 7]);
+        expect(flow2.get()).toEqual([1, 2, 3, 5]);
       });
     });
 
@@ -203,18 +223,24 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const arr = [1, 2, 3];
         const flow = arrayFlow(arr);
         expect(flow.flowString().get()).toBe("1,2,3");
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3]);
       });
 
       it("flowLocaleString: 배열을 로케일에 맞는 문자열로 변환해야 합니다", () => {
         const arr = [1, 2, 3];
         const flow = arrayFlow(arr);
         expect(flow.flowLocaleString().get()).toBe("1,2,3");
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3]);
       });
 
       it("flowStringfy: 배열을 JSON 문자열로 변환해야 합니다", () => {
         const arr = [1, 2, 3];
         const flow = arrayFlow(arr);
         expect(flow.flowStringfy().get()).toBe("[1,2,3]");
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3]);
       });
 
       it("flowObject: 배열을 객체로 변환해야 합니다", () => {
@@ -222,6 +248,33 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const flow = arrayFlow(arr);
         const objFlow = flow.flowObject();
         expect(objFlow.get()).toEqual({ 0: 1, 1: 2, 2: 3 });
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3]);
+      });
+
+      it("flowObjectEntries: 배열을 객체로 변환해야 합니다", () => {
+        const arr = [
+          ["a", 1],
+          ["b", 2],
+          ["c", 3],
+        ];
+        const flow = arrayFlow(arr);
+        const objFlow = flow.flowObjectEntries();
+        expect(objFlow.get()).toEqual({ a: 1, b: 2, c: 3 });
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([
+          ["a", 1],
+          ["b", 2],
+          ["c", 3],
+        ]);
+      });
+
+      it("flowObjectEntries: 잘못된 배열은 FlowError를 리턴하고 원본 배열은 변경되지 않아야 합니다", () => {
+        const arr = [1, 2, 3];
+        const flow = arrayFlow(arr);
+        expect(isError(flow.flowObjectEntries())).toBe(true);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3]);
       });
 
       it("flowBoolean: 배열이 비어있지 않은지 확인해야 합니다", () => {
@@ -232,12 +285,16 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
         const arr2: number[] = [];
         const flow2 = arrayFlow(arr2);
         expect(flow2.flowBoolean().get()).toBe(false);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow2.get()).toEqual([]);
       });
 
       it("flowNumber: 배열의 길이를 반환해야 합니다", () => {
         const arr = [1, 2, 3, 4, 5];
         const flow = arrayFlow(arr);
         expect(flow.flowNumber().get()).toBe(5);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3, 4, 5]);
       });
     });
 
@@ -250,10 +307,12 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
           .map((x) => x * 2)
           .reverse();
         expect(result.get()).toEqual([10, 6, 2]);
+        // 원본 배열은 변경되지 않아야 합니다
+        expect(flow.get()).toEqual([1, 2, 3, 4, 5]);
       });
     });
   });
 };
 
-testArrayFlow(ArrayFlowJS);
-testArrayFlow(ArrayFlowESM);
+testArrayFlow(ArrayFlowJS as typeof ArrayFlow, isErrorJS);
+testArrayFlow(ArrayFlowESM as typeof ArrayFlow, isErrorESM);

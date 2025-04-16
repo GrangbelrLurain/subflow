@@ -1,36 +1,40 @@
 import { describe, it, expect } from "vitest";
-import { FlowError as FlowErrorType } from "@subflow/index";
-import { FlowError as FlowErrorJS } from "@build/index.js";
-import { FlowError as FlowErrorESM } from "@build/index.cjs";
+import { errorFlow as ErrorFlow, isError } from "@subflow/error";
+import { errorFlow as ErrorFlowESM } from "@build/index.cjs";
+import { errorFlow as ErrorFlowJS } from "@build/index.js";
 
-const testFlowError = (FlowError: typeof FlowErrorType) => {
+const testFlowError = (errorFlow: typeof ErrorFlow<any>) => {
   describe("FlowError", () => {
     it("FlowError 인스턴스를 생성해야 합니다", () => {
-      const error = new FlowError("string", "test", "테스트 오류", "TEST_ERROR", Date.now(), "traceId");
+      const error = errorFlow({ type: "string", value: "test", message: "테스트 오류", code: "TEST_ERROR", timestamp: Date.now(), traceId: "traceId" });
 
-      expect(error.type).toBe("string");
-      expect(error.value).toBe("test");
-      expect(error.message).toBe("테스트 오류");
-      expect(error.code).toBe("TEST_ERROR");
-      expect(error.timestamp).toBeLessThanOrEqual(Date.now());
-      expect(error.traceId).toBe("traceId");
+      if (isError(error)) {
+        expect(error.getError().type).toBe("string");
+        expect(error.getError().value).toBe("test");
+        expect(error.getError().message).toBe("테스트 오류");
+        expect(error.getError().code).toBe("TEST_ERROR");
+        expect(error.getError().timestamp).toBeLessThanOrEqual(Date.now());
+        expect(error.getError().traceId).toBe("traceId");
+      }
     });
 
     it("선택적 매개변수를 포함한 FlowError 인스턴스를 생성해야 합니다", () => {
       const cause = new Error("원인 오류");
-      const error = new FlowError("number", 42, "숫자 오류", "NUMBER_ERROR", Date.now(), "traceId", "스택 트레이스", cause);
+      const error = errorFlow({ type: "number", value: 42, message: "숫자 오류", code: "NUMBER_ERROR", timestamp: Date.now(), traceId: "traceId", stack: "스택 트레이스", cause });
 
-      expect(error.type).toBe("number");
-      expect(error.value).toBe(42);
-      expect(error.message).toBe("숫자 오류");
-      expect(error.code).toBe("NUMBER_ERROR");
-      expect(error.timestamp).toBeLessThanOrEqual(Date.now());
-      expect(error.traceId).toBe("traceId");
-      expect(error.stack).toBe("스택 트레이스");
-      expect(error.cause).toBe(cause);
+      if (isError(error)) {
+        expect(error.getError().type).toBe("number");
+        expect(error.getError().value).toBe(42);
+        expect(error.getError().message).toBe("숫자 오류");
+        expect(error.getError().code).toBe("NUMBER_ERROR");
+        expect(error.getError().timestamp).toBeLessThanOrEqual(Date.now());
+        expect(error.getError().traceId).toBe("traceId");
+        expect(error.getError().stack).toBe("스택 트레이스");
+        expect(error.getError().cause).toBe(cause);
+      }
     });
   });
 };
 
-testFlowError(FlowErrorJS);
-testFlowError(FlowErrorESM);
+testFlowError(ErrorFlowESM as typeof ErrorFlow<any>);
+testFlowError(ErrorFlowJS as typeof ErrorFlow<any>);

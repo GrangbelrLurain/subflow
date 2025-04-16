@@ -1,15 +1,23 @@
 // test/createMonad.test.ts
 import { describe, it, expect } from "vitest";
-import { createFlow as CreateFlow, safer as Safer, FlowError as FlowErrorType, FlowReturn } from "@subflow/index";
-import { createFlow as CreateFlowJS, safer as SaferJS, FlowError as FlowErrorJS } from "@build/index.js";
-import { createFlow as CreateFlowESM, safer as SaferESM, FlowError as FlowErrorESM } from "@build/index.cjs";
+import { createFlow as CreateFlow, safer as Safer, FlowReturn } from "@subflow/index";
+import { createFlow as CreateFlowJS, safer as SaferJS, isError as isErrorJS, errorFlow as ErrorFlowJS } from "@build/index.js";
+import { createFlow as CreateFlowESM, safer as SaferESM, isError as isErrorESM, errorFlow as ErrorFlowESM } from "@build/index.cjs";
+import { errorFlow as ErrorFlow } from "@subflow/error";
 
-const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, FlowError: typeof FlowErrorType) => {
+const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isError: typeof isErrorESM | typeof isErrorJS, errorFlow: typeof ErrorFlow) => {
   describe("createFlow", () => {
     describe("기본 기능", () => {
       it("값을 가진 flow를 생성해야 합니다", () => {
         const value = "test value";
-        const init = safer(value, (value: string): string => value, new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId"));
+        const init = safer(value, (value: string): string => value, {
+          type: "string",
+          value,
+          message: "Value error",
+          code: "TEST_ERROR",
+          timestamp: Date.now(),
+          traceId: "traceId",
+        });
 
         const flow = createFlow(init, {});
         expect(flow.get()).toBe("test value");
@@ -17,31 +25,43 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, Flow
 
       it("오류가 없을 때 isError가 false를 반환해야 합니다", () => {
         const value = "test value";
-        const init = safer(value, (value: string): string => value, new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId"));
+        const init = safer(value, (value: string): string => value, {
+          type: "string",
+          value,
+          message: "Value error",
+          code: "TEST_ERROR",
+          timestamp: Date.now(),
+          traceId: "traceId",
+        });
 
         const flow = createFlow(init, {});
-        expect(flow.isError()).toBe(false);
+        expect(isError(flow)).toBe(false);
       });
 
       it("오류가 있을 때 isError가 true를 반환해야 합니다", () => {
         const value = 123; // 문자열 타입을 기대하지만 숫자를 전달
-        const error = new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
+        const error = errorFlow({
+          type: "string",
+          value,
+          message: "Value error",
+          code: "TEST_ERROR",
+          timestamp: Date.now(),
+          traceId: "traceId",
+        });
 
-        const flow = createFlow(error, {});
-        expect(flow.isError()).toBe(true);
-      });
-
-      it("오류가 있을 때 getError가 오류를 반환해야 합니다", () => {
-        const value = 123;
-        const error = new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
-
-        const flow = createFlow(error, {});
-        expect(flow.getError()).toBe(error);
+        expect(isError(error)).toBe(true);
       });
 
       it("오류가 없을 때 getError가 undefined를 반환해야 합니다", () => {
         const value = "test value";
-        const init = safer(value, (value: string): string => value, new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId"));
+        const init = safer(value, (value: string): string => value, {
+          type: "string",
+          value,
+          message: "Value error",
+          code: "TEST_ERROR",
+          timestamp: Date.now(),
+          traceId: "traceId",
+        });
 
         const flow = createFlow(init, {});
         expect(flow.getError()).toBe(undefined);
@@ -57,9 +77,16 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, Flow
           },
         };
 
-        const init = safer(value, (value: string): string => value, new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId"));
+        const init = safer(value, (value: string): string => value, {
+          type: "string",
+          value,
+          message: "Value error",
+          code: "TEST_ERROR",
+          timestamp: Date.now(),
+          traceId: "traceId",
+        });
 
-        const flow = createFlow(init, extensions);
+        const flow = createFlow(init, extensions as any);
         expect(flow.customMethod()).toBe(10); // 'test value'의 길이
       });
 
@@ -72,16 +99,29 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, Flow
           },
         };
 
-        const init = new FlowError("string", value as unknown as string, "Value error", "TEST_ERROR", Date.now(), "traceId");
-        const flow = createFlow(init, extensions);
-        expect(flow.customMethod()).toBe(undefined); // void 0은 undefined
+        const flow = errorFlow<string, typeof extensions>({
+          type: "string",
+          value: value as unknown as string,
+          message: "Value error",
+          code: "TEST_ERROR",
+          timestamp: Date.now(),
+          traceId: "traceId",
+        });
+        expect(flow.customMethod()).toBe(undefined);
       });
     });
 
     describe("불변성", () => {
       it("flow 값이 불변해야 합니다", () => {
         const value = "test value";
-        const init = safer(value, (value: string): string => value, new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId"));
+        const init = safer(value, (value: string): string => value, {
+          type: "string",
+          value,
+          message: "Value error",
+          code: "TEST_ERROR",
+          timestamp: Date.now(),
+          traceId: "traceId",
+        });
 
         const flow = createFlow(init, {});
 
@@ -102,5 +142,5 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, Flow
   });
 };
 
-testCreateFlow(CreateFlowJS, SaferJS, FlowErrorJS);
-testCreateFlow(CreateFlowESM, SaferESM, FlowErrorESM);
+testCreateFlow(CreateFlowJS as typeof CreateFlow, SaferJS as typeof Safer, isErrorJS, ErrorFlowJS as typeof ErrorFlow);
+testCreateFlow(CreateFlowESM as typeof CreateFlow, SaferESM as typeof Safer, isErrorESM, ErrorFlowESM as typeof ErrorFlow);

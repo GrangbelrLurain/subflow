@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { objectFlow as ObjectFlow } from "@subflow/object";
-import { objectFlow as ObjectFlowJS } from "@build/index.js";
-import { objectFlow as ObjectFlowESM } from "@build/index.cjs";
+import { objectFlow as ObjectFlow } from "@subflow/index";
+import { objectFlow as ObjectFlowJS, isError as isErrorJS } from "@build/index.js";
+import { objectFlow as ObjectFlowESM, isError as isErrorESM } from "@build/index.cjs";
 
-const testObjectFlow = (objectFlow: typeof ObjectFlow) => {
+const testObjectFlow = (objectFlow: typeof ObjectFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
   describe("objectFlow", () => {
     describe("기본 기능", () => {
       it("객체 값을 가진 flow를 생성해야 합니다", () => {
@@ -15,7 +15,7 @@ const testObjectFlow = (objectFlow: typeof ObjectFlow) => {
       it("오류가 없을 때 isError가 false를 반환해야 합니다", () => {
         const obj = { name: "John", age: 30 };
         const flow = objectFlow(obj);
-        expect(flow.isError()).toBe(false);
+        expect(isError(flow)).toBe(false);
       });
     });
 
@@ -71,6 +71,14 @@ const testObjectFlow = (objectFlow: typeof ObjectFlow) => {
       });
     });
 
+    describe("문자열 변환 메서드", () => {
+      it("flowString: 객체를 JSON 문자열로 변환해야 합니다", () => {
+        const obj = { name: "John", age: 30 };
+        const flow = objectFlow(obj);
+        expect(flow.flowString().get()).toBe('{"name":"John","age":30}');
+      });
+    });
+
     describe("메서드 체이닝", () => {
       it("여러 메서드를 체이닝할 수 있어야 합니다", () => {
         const obj = { name: "John", age: 30 };
@@ -79,8 +87,25 @@ const testObjectFlow = (objectFlow: typeof ObjectFlow) => {
         expect(result.get()).toEqual({ name: "John", address: "Seoul" });
       });
     });
+
+    describe("오류 처리", () => {
+      it("오류가 있을 때 isError가 true를 반환해야 합니다", () => {
+        const flow = objectFlow(null as unknown as object);
+        expect(isError(flow)).toBe(true);
+      });
+
+      it("오류가 있을 때 get 메서드가 입력 객체를 반환해야 합니다", () => {
+        const flow = objectFlow(null as unknown as object);
+        expect(flow.get()).toBe(null);
+      });
+
+      it("오류가 있을 때 getError 메서드가 오류 객체를 반환해야 합니다", () => {
+        const flow = objectFlow(null as unknown as object);
+        expect(isError(flow)).toBe(true);
+      });
+    });
   });
 };
 
-testObjectFlow(ObjectFlowJS);
-testObjectFlow(ObjectFlowESM);
+testObjectFlow(ObjectFlowJS as typeof ObjectFlow, isErrorJS);
+testObjectFlow(ObjectFlowESM as typeof ObjectFlow, isErrorESM);

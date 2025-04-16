@@ -1,5 +1,4 @@
 import { createFlow } from "@subflow/core";
-import { FlowError } from "@subflow/error";
 import { objectFlow } from "@subflow/object";
 import { stringFlow } from "@subflow/string";
 import { Methods, FlowReturn } from "@subflow/types/core";
@@ -11,10 +10,12 @@ import {
   BooleanFlowReturn,
   StringFlowReturn,
   ObjectFlowReturn,
+  ObjectFlowMethods,
 } from "@subflow/types/flows";
 import { numberFlow } from "@subflow/number";
 import { safer } from "@subflow/utils";
 import { booleanFlow } from "@subflow/boolean";
+import { errorFlow, isError } from "@subflow/error";
 
 export const arrayFlow = <T extends any[], M extends Methods<any[]>>(
   value: T,
@@ -189,7 +190,30 @@ export const arrayFlow = <T extends any[], M extends Methods<any[]>>(
       return stringFlow(JSON.stringify(this.get()));
     },
     flowObject(this: FlowReturn<T>): ObjectFlowReturn {
-      return objectFlow(Object.fromEntries(Object.entries(this.get())));
+      try {
+        return objectFlow(Object.fromEntries(Object.entries(this.get())));
+      } catch (e) {
+        return errorFlow<T, ObjectFlowMethods>({
+          message: "Value must be entriesable of array",
+          code: "ARRAY_FLOW_ERROR",
+          type: "array",
+          value: this.get(),
+          cause: e as Error,
+        });
+      }
+    },
+    flowObjectEntries(this: FlowReturn<T>): ObjectFlowReturn {
+      try {
+        return objectFlow(Object.fromEntries(this.get()));
+      } catch (e) {
+        return errorFlow<T, ObjectFlowMethods>({
+          message: "Value must be entriesable of array",
+          code: "ARRAY_FLOW_ERROR",
+          type: "array",
+          value: this.get(),
+          cause: e as Error,
+        });
+      }
     },
     flowBoolean(this: FlowReturn<T>): BooleanFlowReturn {
       return booleanFlow(this.get().length > 0);
@@ -200,7 +224,7 @@ export const arrayFlow = <T extends any[], M extends Methods<any[]>>(
     ...(methods || {}),
   };
 
-  const init = safer(
+  const init = safer<T, M & typeof defaultMethods>(
     value,
     (value: T): T => {
       if (!Array.isArray(value)) {
@@ -209,17 +233,19 @@ export const arrayFlow = <T extends any[], M extends Methods<any[]>>(
 
       return value;
     },
-    new FlowError(
-      "array",
+    {
+      type: "array",
       value,
-      "Value must be an array",
-      "ARRAY_FLOW_ERROR",
-      Date.now(),
-      "traceId"
-    )
+      message: "Value must be an array",
+      code: "ARRAY_FLOW_ERROR",
+    }
   );
 
-  return createFlow<T, typeof defaultMethods>(init, defaultMethods);
+  if (isError(init)) {
+    return init;
+  }
+
+  return createFlow<T, typeof defaultMethods>(init as T, defaultMethods);
 };
 
 export default arrayFlow;
