@@ -1,17 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { booleanFlow as BooleanFlow } from "@subflow/boolean";
-import {
-  booleanFlow as BooleanFlowJS,
-  isError as isErrorJS,
-} from "@build/index.js";
-import {
-  booleanFlow as BooleanFlowESM,
-  isError as isErrorESM,
-} from "@build/index.cjs";
-const testBooleanFlow = (
-  booleanFlow: typeof BooleanFlow,
-  isError: typeof isErrorESM | typeof isErrorJS
-) => {
+import { booleanFlow as BooleanFlowJS, isError as isErrorJS } from "@build/index.js";
+import { booleanFlow as BooleanFlowESM, isError as isErrorESM } from "@build/index.cjs";
+
+const testBooleanFlow = (booleanFlow: typeof BooleanFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
   describe("booleanFlow", () => {
     describe("기본 기능", () => {
       it("불리언 값을 가진 flow를 생성해야 합니다", () => {

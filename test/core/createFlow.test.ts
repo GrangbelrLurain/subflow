@@ -1,30 +1,11 @@
 // test/createMonad.test.ts
 import { describe, it, expect } from "vitest";
-import {
-  createFlow as CreateFlow,
-  safer as Safer,
-  FlowReturn,
-} from "@subflow/index";
-import {
-  createFlow as CreateFlowJS,
-  safer as SaferJS,
-  isError as isErrorJS,
-  errorFlow as ErrorFlowJS,
-} from "@build/index.js";
-import {
-  createFlow as CreateFlowESM,
-  safer as SaferESM,
-  isError as isErrorESM,
-  errorFlow as ErrorFlowESM,
-} from "@build/index.cjs";
+import { createFlow as CreateFlow, safer as Safer, FlowReturn } from "@subflow/index";
+import { createFlow as CreateFlowJS, safer as SaferJS, isError as isErrorJS, errorFlow as ErrorFlowJS } from "@build/index.js";
+import { createFlow as CreateFlowESM, safer as SaferESM, isError as isErrorESM, errorFlow as ErrorFlowESM } from "@build/index.cjs";
 import { errorFlow as ErrorFlow } from "@subflow/error";
 
-const testCreateFlow = (
-  createFlow: typeof CreateFlow,
-  safer: typeof Safer,
-  isError: typeof isErrorESM | typeof isErrorJS,
-  errorFlow: typeof ErrorFlow
-) => {
+const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isError: typeof isErrorESM | typeof isErrorJS, errorFlow: typeof ErrorFlow) => {
   describe("createFlow", () => {
     describe("기본 기능", () => {
       it("값을 가진 flow를 생성해야 합니다", () => {
@@ -161,15 +142,5 @@ const testCreateFlow = (
   });
 };
 
-testCreateFlow(
-  CreateFlowJS as typeof CreateFlow,
-  SaferJS as typeof Safer,
-  isErrorJS,
-  ErrorFlowJS as typeof ErrorFlow
-);
-testCreateFlow(
-  CreateFlowESM as typeof CreateFlow,
-  SaferESM as typeof Safer,
-  isErrorESM,
-  ErrorFlowESM as typeof ErrorFlow
-);
+testCreateFlow(CreateFlowJS as typeof CreateFlow, SaferJS as typeof Safer, isErrorJS, ErrorFlowJS as typeof ErrorFlow);
+testCreateFlow(CreateFlowESM as typeof CreateFlow, SaferESM as typeof Safer, isErrorESM, ErrorFlowESM as typeof ErrorFlow);

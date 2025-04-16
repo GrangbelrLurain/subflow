@@ -1,18 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { objectFlow as ObjectFlow } from "@subflow/index";
-import {
-  objectFlow as ObjectFlowJS,
-  isError as isErrorJS,
-} from "@build/index.js";
-import {
-  objectFlow as ObjectFlowESM,
-  isError as isErrorESM,
-} from "@build/index.cjs";
+import { objectFlow as ObjectFlowJS, isError as isErrorJS } from "@build/index.js";
+import { objectFlow as ObjectFlowESM, isError as isErrorESM } from "@build/index.cjs";
 
-const testObjectFlow = (
-  objectFlow: typeof ObjectFlow,
-  isError: typeof isErrorESM | typeof isErrorJS
-) => {
+const testObjectFlow = (objectFlow: typeof ObjectFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
   describe("objectFlow", () => {
     describe("기본 기능", () => {
       it("객체 값을 가진 flow를 생성해야 합니다", () => {

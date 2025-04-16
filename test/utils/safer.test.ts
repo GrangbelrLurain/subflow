@@ -1,21 +1,9 @@
 import { safer as Safer } from "@subflow/index";
-import { safer as SaferJS } from "@build/index.js";
-import { safer as SaferESM } from "@build/index.cjs";
+import { safer as SaferJS, isError as isErrorJS } from "@build/index.js";
+import { safer as SaferESM, isError as isErrorESM } from "@build/index.cjs";
 import { describe, it, expect } from "vitest";
-import { errorFlow as ErrorFlow } from "@subflow/error";
-import {
-  errorFlow as ErrorFlowJS,
-  isError as isErrorJS,
-} from "@build/index.js";
-import {
-  errorFlow as ErrorFlowESM,
-  isError as isErrorESM,
-} from "@build/index.cjs";
 
-const testSafer = (
-  safer: typeof Safer,
-  isError: typeof isErrorESM | typeof isErrorJS
-) => {
+const testSafer = (safer: typeof Safer, isError: typeof isErrorESM | typeof isErrorJS) => {
   describe("safer", () => {
     describe("정상 케이스", () => {
       it("유효한 값을 전달하면 그 값을 반환해야 합니다", () => {

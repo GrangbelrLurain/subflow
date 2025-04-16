@@ -1,17 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { arrayFlow as ArrayFlow } from "@subflow/array";
-import {
-  arrayFlow as ArrayFlowJS,
-  isError as isErrorJS,
-} from "@build/index.js";
-import {
-  arrayFlow as ArrayFlowESM,
-  isError as isErrorESM,
-} from "@build/index.cjs";
-const testArrayFlow = (
-  arrayFlow: typeof ArrayFlow,
-  isError: typeof isErrorESM | typeof isErrorJS
-) => {
+import { arrayFlow as ArrayFlowJS, isError as isErrorJS } from "@build/index.js";
+import { arrayFlow as ArrayFlowESM, isError as isErrorESM } from "@build/index.cjs";
+
+const testArrayFlow = (arrayFlow: typeof ArrayFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
   describe("arrayFlow", () => {
     describe("기본 기능", () => {
       it("배열 값을 가진 flow를 생성해야 합니다", () => {

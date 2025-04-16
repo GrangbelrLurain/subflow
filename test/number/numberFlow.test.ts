@@ -3,6 +3,7 @@ import { numberFlow as NumberFlow } from "@subflow/number";
 import { numberFlow as NumberFlowJS } from "@build/index.js";
 import { numberFlow as NumberFlowESM } from "@build/index.cjs";
 import { isError } from "@subflow/error";
+
 const testNumberFlow = (numberFlow: typeof NumberFlow) => {
   describe("numberFlow", () => {
     describe("기본 기능", () => {
