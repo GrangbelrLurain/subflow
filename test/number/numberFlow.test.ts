@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { numberFlow as NumberFlow } from "@subflow/number";
 import { numberFlow as NumberFlowJS } from "@build/index.js";
 import { numberFlow as NumberFlowESM } from "@build/index.cjs";
-
+import { isError } from "@subflow/error";
 const testNumberFlow = (numberFlow: typeof NumberFlow) => {
   describe("numberFlow", () => {
     describe("기본 기능", () => {
@@ -13,7 +13,7 @@ const testNumberFlow = (numberFlow: typeof NumberFlow) => {
 
       it("오류가 없을 때 isError가 false를 반환해야 합니다", () => {
         const flow = numberFlow(42);
-        expect(flow.isError()).toBe(false);
+        expect(isError(flow)).toBe(false);
       });
     });
 
@@ -143,5 +143,5 @@ const testNumberFlow = (numberFlow: typeof NumberFlow) => {
   });
 };
 
-testNumberFlow(NumberFlowJS);
-testNumberFlow(NumberFlowESM);
+testNumberFlow(NumberFlowJS as typeof NumberFlow);
+testNumberFlow(NumberFlowESM as typeof NumberFlow);

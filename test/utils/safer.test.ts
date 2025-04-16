@@ -1,9 +1,13 @@
-import { safer as Safer, FlowError as FlowErrorType } from "@subflow/index";
-import { safer as SaferJS, FlowError as FlowErrorJS } from "@build/index.js";
-import { safer as SaferESM, FlowError as FlowErrorESM } from "@build/index.cjs";
+import { safer as Safer } from "@subflow/index";
+import { safer as SaferJS } from "@build/index.js";
+import { safer as SaferESM } from "@build/index.cjs";
 import { describe, it, expect } from "vitest";
+import { errorFlow as ErrorFlow } from "@subflow/error";
+import { errorFlow as ErrorFlowJS } from "@build/index.js";
+import { errorFlow as ErrorFlowESM } from "@build/index.cjs";
+import { isError } from "@subflow/error";
 
-const testSafer = (safer: typeof Safer, FlowError: typeof FlowErrorType) => {
+const testSafer = (safer: typeof Safer, errorFlow: typeof ErrorFlow) => {
   describe("safer", () => {
     describe("정상 케이스", () => {
       it("유효한 값을 전달하면 그 값을 반환해야 합니다", () => {
@@ -14,9 +18,7 @@ const testSafer = (safer: typeof Safer, FlowError: typeof FlowErrorType) => {
           }
           return value;
         };
-        const errorFallback = new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
-
-        const result = safer(value, validator, errorFallback);
+        const result = safer(value, validator, { type: "string", value, message: "Value error", code: "TEST_ERROR", timestamp: Date.now(), traceId: "traceId" });
         expect(result).toBe("test value");
       });
     });
@@ -30,10 +32,9 @@ const testSafer = (safer: typeof Safer, FlowError: typeof FlowErrorType) => {
           }
           return value;
         };
-        const errorFallback = new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
 
-        const result = safer(value, validator, errorFallback);
-        expect(result).toBe(errorFallback);
+        const result = safer(value, validator, { type: "string", value, message: "Value error", code: "TEST_ERROR", timestamp: Date.now(), traceId: "traceId" });
+        expect(isError(result)).toBe(true);
       });
 
       it("validator가 다른 오류 타입을 던져도 errorFallback을 반환해야 합니다", () => {
@@ -44,10 +45,9 @@ const testSafer = (safer: typeof Safer, FlowError: typeof FlowErrorType) => {
           }
           return value;
         };
-        const errorFallback = new FlowError("string", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
 
-        const result = safer(value, validator, errorFallback);
-        expect(result).toBe(errorFallback);
+        const result = safer(value, validator, { type: "string", value, message: "Value error", code: "TEST_ERROR", timestamp: Date.now(), traceId: "traceId" });
+        expect(isError(result)).toBe(true);
       });
     });
 
@@ -60,9 +60,8 @@ const testSafer = (safer: typeof Safer, FlowError: typeof FlowErrorType) => {
           }
           return value;
         };
-        const errorFallback = new FlowError("number", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
 
-        const result = safer(value, validator, errorFallback);
+        const result = safer(value, validator, { type: "number", value, message: "Value error", code: "TEST_ERROR", timestamp: Date.now(), traceId: "traceId" });
         expect(result).toBe(42);
       });
 
@@ -74,9 +73,8 @@ const testSafer = (safer: typeof Safer, FlowError: typeof FlowErrorType) => {
           }
           return value;
         };
-        const errorFallback = new FlowError("boolean", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
 
-        const result = safer(value, validator, errorFallback);
+        const result = safer(value, validator, { type: "boolean", value, message: "Value error", code: "TEST_ERROR", timestamp: Date.now(), traceId: "traceId" });
         expect(result).toBe(true);
       });
 
@@ -88,14 +86,13 @@ const testSafer = (safer: typeof Safer, FlowError: typeof FlowErrorType) => {
           }
           return value;
         };
-        const errorFallback = new FlowError("object", value, "Value error", "TEST_ERROR", Date.now(), "traceId");
 
-        const result = safer(value, validator, errorFallback);
+        const result = safer(value, validator, { type: "object", value, message: "Value error", code: "TEST_ERROR", timestamp: Date.now(), traceId: "traceId" });
         expect(result).toEqual({ name: "Test" });
       });
     });
   });
 };
 
-testSafer(SaferJS, FlowErrorJS);
-testSafer(SaferESM, FlowErrorESM);
+testSafer(SaferJS as typeof Safer, ErrorFlowJS as typeof ErrorFlow);
+testSafer(SaferESM as typeof Safer, ErrorFlowESM as typeof ErrorFlow);

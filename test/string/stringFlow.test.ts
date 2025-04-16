@@ -2,6 +2,7 @@ import { stringFlow as StringFlow } from "@subflow/string";
 import { stringFlow as StringFlowJS } from "@build/index.js";
 import { stringFlow as StringFlowESM } from "@build/index.cjs";
 import { describe, it, expect } from "vitest";
+import { isError } from "@subflow/error";
 
 const testStringFlow = (stringFlow: typeof StringFlow) => {
   describe("stringFlow", () => {
@@ -13,7 +14,7 @@ const testStringFlow = (stringFlow: typeof StringFlow) => {
 
       it("오류가 없을 때 isError가 false를 반환해야 합니다", () => {
         const flow = stringFlow("hello");
-        expect(flow.isError()).toBe(false);
+        expect(isError(flow)).toBe(false);
       });
     });
 
@@ -70,43 +71,43 @@ const testStringFlow = (stringFlow: typeof StringFlow) => {
     describe("문자열 탐색 메서드", () => {
       it("startsWith: 문자열이 특정 문자열로 시작하는지 확인해야 합니다", () => {
         const flow = stringFlow("hello world");
-        expect(flow.startsWith("hello")).toBe(true);
-        expect(flow.startsWith("world")).toBe(false);
+        expect(flow.startsWith("hello").get()).toBe(true);
+        expect(flow.startsWith("world").get()).toBe(false);
       });
 
       it("endsWith: 문자열이 특정 문자열로 끝나는지 확인해야 합니다", () => {
         const flow = stringFlow("hello world");
-        expect(flow.endsWith("world")).toBe(true);
-        expect(flow.endsWith("hello")).toBe(false);
+        expect(flow.endsWith("world").get()).toBe(true);
+        expect(flow.endsWith("hello").get()).toBe(false);
       });
 
       it("includes: 문자열이 특정 문자열을 포함하는지 확인해야 합니다", () => {
         const flow = stringFlow("hello world");
-        expect(flow.includes("llo wo")).toBe(true);
-        expect(flow.includes("goodbye")).toBe(false);
+        expect(flow.includes("llo world").get()).toBe(true);
+        expect(flow.includes("goodbye").get()).toBe(false);
       });
 
       it("indexOf: 문자열에서 특정 문자열의 인덱스를 반환해야 합니다", () => {
         const flow = stringFlow("hello world");
-        expect(flow.indexOf("world")).toBe(6);
-        expect(flow.indexOf("goodbye")).toBe(-1);
+        expect(flow.indexOf("world").get()).toBe(6);
+        expect(flow.indexOf("goodbye").get()).toBe(-1);
       });
 
       it("lastIndexOf: 문자열에서 특정 문자열의 마지막 인덱스를 반환해야 합니다", () => {
         const flow = stringFlow("hello world hello");
-        expect(flow.lastIndexOf("hello")).toBe(12);
+        expect(flow.lastIndexOf("hello").get()).toBe(12);
       });
     });
 
     describe("문자열 추출 메서드", () => {
       it("charAt: 특정 위치의 문자를 반환해야 합니다", () => {
         const flow = stringFlow("hello");
-        expect(flow.charAt(1)).toBe("e");
+        expect(flow.charAt(1).get()).toBe("e");
       });
 
       it("charCodeAt: 특정 위치의 문자 코드를 반환해야 합니다", () => {
         const flow = stringFlow("hello");
-        expect(flow.charCodeAt(1)).toBe("e".charCodeAt(0));
+        expect(flow.charCodeAt(1).get()).toBe("e".charCodeAt(0));
       });
 
       it("slice: 문자열의 일부를 추출해야 합니다", () => {
@@ -126,7 +127,7 @@ const testStringFlow = (stringFlow: typeof StringFlow) => {
 
       it("split: 문자열을 특정 구분자로 분할해야 합니다", () => {
         const flow = stringFlow("hello,world");
-        expect(flow.split(",")).toEqual(["hello", "world"]);
+        expect(flow.split(",").get()).toEqual(["hello", "world"]);
       });
     });
 
@@ -170,5 +171,5 @@ const testStringFlow = (stringFlow: typeof StringFlow) => {
   });
 };
 
-testStringFlow(StringFlowJS);
-testStringFlow(StringFlowESM);
+testStringFlow(StringFlowJS as typeof StringFlow);
+testStringFlow(StringFlowESM as typeof StringFlow);

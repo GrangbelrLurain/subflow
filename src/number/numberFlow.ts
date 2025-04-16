@@ -1,14 +1,10 @@
 import { createFlow } from "@subflow/core/createFlow";
 import { stringFlow } from "@subflow/string/stringFlow";
 import { Methods, FlowReturn } from "@subflow/types/core";
-import { FlowError } from "@subflow/error";
 import { safer } from "@subflow/utils";
 import { NumberFlowMethods } from "@subflow/types/flows";
 
-export const numberFlow = <M extends Methods<number>>(
-  value: number,
-  methods?: M
-) => {
+export const numberFlow = <M extends Methods<number>>(value: number, methods?: M) => {
   const defaultMethods: NumberFlowMethods = {
     add(this: FlowReturn<number>, num: number) {
       return numberFlow(this.get() + num);
@@ -67,11 +63,7 @@ export const numberFlow = <M extends Methods<number>>(
     toPrecision(this: FlowReturn<number>, precision?: number) {
       return stringFlow(this.get().toPrecision(precision));
     },
-    flowLocaleString(
-      this: FlowReturn<number>,
-      locales: string | string[],
-      options?: Intl.NumberFormatOptions
-    ) {
+    flowLocaleString(this: FlowReturn<number>, locales: string | string[], options?: Intl.NumberFormatOptions) {
       return stringFlow(this.get().toLocaleString(locales, options));
     },
     flowString(this: FlowReturn<number>, radix?: number) {
@@ -79,7 +71,7 @@ export const numberFlow = <M extends Methods<number>>(
     },
   };
 
-  const init = safer(
+  const init = safer<number, M & typeof defaultMethods>(
     value,
     (value: number): number => {
       if (typeof value !== "number") {
@@ -88,18 +80,17 @@ export const numberFlow = <M extends Methods<number>>(
 
       return value;
     },
-    new FlowError(
-      "number",
+    {
+      type: "number",
       value,
-      "Value must be a number",
-      "NUMBER_FLOW_ERROR",
-      Date.now(),
-      "traceId"
-    )
+      message: "Value must be a number",
+      code: "NUMBER_FLOW_ERROR",
+    }
   );
 
-  return createFlow(
-    init,
-    methods ? { ...defaultMethods, ...methods } : defaultMethods
-  );
+  if (typeof init === "object" && "getError" in init && typeof init.isError === "boolean" && init.isError) {
+    return init;
+  }
+
+  return createFlow(init as number, methods ? { ...defaultMethods, ...methods } : defaultMethods);
 };

@@ -1,9 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { booleanFlow } from "@build/index";
 import { booleanFlow as BooleanFlow } from "@subflow/boolean";
 import { booleanFlow as BooleanFlowJS } from "@build/index.js";
 import { booleanFlow as BooleanFlowESM } from "@build/index.cjs";
-
+import { isError } from "@subflow/error";
 const testBooleanFlow = (booleanFlow: typeof BooleanFlow) => {
   describe("booleanFlow", () => {
     describe("기본 기능", () => {
@@ -17,7 +16,7 @@ const testBooleanFlow = (booleanFlow: typeof BooleanFlow) => {
 
       it("오류가 없을 때 isError가 false를 반환해야 합니다", () => {
         const flow = booleanFlow(true);
-        expect(flow.isError()).toBe(false);
+        expect(isError(flow)).toBe(false);
       });
     });
 
@@ -151,5 +150,5 @@ const testBooleanFlow = (booleanFlow: typeof BooleanFlow) => {
   });
 };
 
-testBooleanFlow(BooleanFlowJS);
-testBooleanFlow(BooleanFlowESM);
+testBooleanFlow(BooleanFlowJS as typeof BooleanFlow);
+testBooleanFlow(BooleanFlowESM as typeof BooleanFlow);
