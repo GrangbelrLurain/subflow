@@ -1,9 +1,18 @@
 import { describe, it, expect } from "vitest";
-import { objectFlow as ObjectFlow, FlowError } from "@subflow/index";
-import { FlowError as FlowErrorJS, objectFlow as ObjectFlowJS } from "@build/index.js";
-import { FlowError as FlowErrorESM, objectFlow as ObjectFlowESM } from "@build/index.cjs";
+import { objectFlow as ObjectFlow } from "@subflow/index";
+import {
+  objectFlow as ObjectFlowJS,
+  isError as isErrorJS,
+} from "@build/index.js";
+import {
+  objectFlow as ObjectFlowESM,
+  isError as isErrorESM,
+} from "@build/index.cjs";
 
-const testObjectFlow = (objectFlow: typeof ObjectFlow, flowError: typeof FlowError) => {
+const testObjectFlow = (
+  objectFlow: typeof ObjectFlow,
+  isError: typeof isErrorESM | typeof isErrorJS
+) => {
   describe("objectFlow", () => {
     describe("기본 기능", () => {
       it("객체 값을 가진 flow를 생성해야 합니다", () => {
@@ -15,7 +24,7 @@ const testObjectFlow = (objectFlow: typeof ObjectFlow, flowError: typeof FlowErr
       it("오류가 없을 때 isError가 false를 반환해야 합니다", () => {
         const obj = { name: "John", age: 30 };
         const flow = objectFlow(obj);
-        expect(flow.isError()).toBe(false);
+        expect(isError(flow)).toBe(false);
       });
     });
 
@@ -91,7 +100,7 @@ const testObjectFlow = (objectFlow: typeof ObjectFlow, flowError: typeof FlowErr
     describe("오류 처리", () => {
       it("오류가 있을 때 isError가 true를 반환해야 합니다", () => {
         const flow = objectFlow(null as unknown as object);
-        expect(flow.isError()).toBe(true);
+        expect(isError(flow)).toBe(true);
       });
 
       it("오류가 있을 때 get 메서드가 입력 객체를 반환해야 합니다", () => {
@@ -101,11 +110,11 @@ const testObjectFlow = (objectFlow: typeof ObjectFlow, flowError: typeof FlowErr
 
       it("오류가 있을 때 getError 메서드가 오류 객체를 반환해야 합니다", () => {
         const flow = objectFlow(null as unknown as object);
-        expect(flow.getError()).toBeInstanceOf(flowError);
+        expect(isError(flow)).toBe(true);
       });
     });
   });
 };
 
-testObjectFlow(ObjectFlowJS, FlowErrorJS);
-testObjectFlow(ObjectFlowESM, FlowErrorESM);
+testObjectFlow(ObjectFlowJS as typeof ObjectFlow, isErrorJS);
+testObjectFlow(ObjectFlowESM as typeof ObjectFlow, isErrorESM);

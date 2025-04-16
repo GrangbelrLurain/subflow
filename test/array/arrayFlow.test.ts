@@ -1,9 +1,17 @@
 import { describe, it, expect } from "vitest";
 import { arrayFlow as ArrayFlow } from "@subflow/array";
-import { arrayFlow as ArrayFlowJS } from "@build/index.js";
-import { arrayFlow as ArrayFlowESM } from "@build/index.cjs";
-import { isError } from "@subflow/error";
-const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
+import {
+  arrayFlow as ArrayFlowJS,
+  isError as isErrorJS,
+} from "@build/index.js";
+import {
+  arrayFlow as ArrayFlowESM,
+  isError as isErrorESM,
+} from "@build/index.cjs";
+const testArrayFlow = (
+  arrayFlow: typeof ArrayFlow,
+  isError: typeof isErrorESM | typeof isErrorJS
+) => {
   describe("arrayFlow", () => {
     describe("기본 기능", () => {
       it("배열 값을 가진 flow를 생성해야 합니다", () => {
@@ -272,7 +280,6 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
       it("flowObjectEntries: 잘못된 배열은 FlowError를 리턴하고 원본 배열은 변경되지 않아야 합니다", () => {
         const arr = [1, 2, 3];
         const flow = arrayFlow(arr);
-        console.log(flow.flowObjectEntries().get());
         expect(isError(flow.flowObjectEntries())).toBe(true);
         // 원본 배열은 변경되지 않아야 합니다
         expect(flow.get()).toEqual([1, 2, 3]);
@@ -315,5 +322,5 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow) => {
   });
 };
 
-testArrayFlow(ArrayFlowJS as typeof ArrayFlow);
-testArrayFlow(ArrayFlowESM as typeof ArrayFlow);
+testArrayFlow(ArrayFlowJS as typeof ArrayFlow, isErrorJS);
+testArrayFlow(ArrayFlowESM as typeof ArrayFlow, isErrorESM);

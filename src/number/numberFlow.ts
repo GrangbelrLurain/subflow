@@ -3,8 +3,12 @@ import { stringFlow } from "@subflow/string/stringFlow";
 import { Methods, FlowReturn } from "@subflow/types/core";
 import { safer } from "@subflow/utils";
 import { NumberFlowMethods } from "@subflow/types/flows";
+import { isError } from "@subflow/error";
 
-export const numberFlow = <M extends Methods<number>>(value: number, methods?: M) => {
+export const numberFlow = <M extends Methods<number>>(
+  value: number,
+  methods?: M
+) => {
   const defaultMethods: NumberFlowMethods = {
     add(this: FlowReturn<number>, num: number) {
       return numberFlow(this.get() + num);
@@ -63,7 +67,11 @@ export const numberFlow = <M extends Methods<number>>(value: number, methods?: M
     toPrecision(this: FlowReturn<number>, precision?: number) {
       return stringFlow(this.get().toPrecision(precision));
     },
-    flowLocaleString(this: FlowReturn<number>, locales: string | string[], options?: Intl.NumberFormatOptions) {
+    flowLocaleString(
+      this: FlowReturn<number>,
+      locales: string | string[],
+      options?: Intl.NumberFormatOptions
+    ) {
       return stringFlow(this.get().toLocaleString(locales, options));
     },
     flowString(this: FlowReturn<number>, radix?: number) {
@@ -88,9 +96,12 @@ export const numberFlow = <M extends Methods<number>>(value: number, methods?: M
     }
   );
 
-  if (typeof init === "object" && "getError" in init && typeof init.isError === "boolean" && init.isError) {
+  if (isError(init)) {
     return init;
   }
 
-  return createFlow(init as number, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow(
+    init as number,
+    methods ? { ...defaultMethods, ...methods } : defaultMethods
+  );
 };

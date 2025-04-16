@@ -5,8 +5,12 @@ import { Methods, FlowReturn } from "@subflow/types/core";
 import { safer } from "@subflow/utils";
 import { ObjectFlowMethods } from "@subflow/types/flows";
 import { stringFlow } from "@subflow/string";
+import { isError } from "@subflow/error";
 
-export const objectFlow = <T extends object, M extends Methods<T>>(value: T, methods?: M) => {
+export const objectFlow = <T extends object, M extends Methods<T>>(
+  value: T,
+  methods?: M
+) => {
   const defaultMethods: ObjectFlowMethods = {
     keys(this: FlowReturn<T>) {
       return arrayFlow(Object.keys(this.get()));
@@ -37,7 +41,7 @@ export const objectFlow = <T extends object, M extends Methods<T>>(value: T, met
   const init = safer<T, M & typeof defaultMethods>(
     value,
     (value: T): T => {
-      if (typeof value !== "object" || value === null) {
+      if (typeof value !== "object" || !value) {
         throw new Error("Value must be an object");
       }
 
@@ -51,9 +55,12 @@ export const objectFlow = <T extends object, M extends Methods<T>>(value: T, met
     }
   );
 
-  if (typeof init === "object" && "getError" in init && typeof init.isError === "boolean" && init.isError) {
+  if (isError(init)) {
     return init;
   }
 
-  return createFlow(init as T, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow(
+    init as T,
+    methods ? { ...defaultMethods, ...methods } : defaultMethods
+  );
 };

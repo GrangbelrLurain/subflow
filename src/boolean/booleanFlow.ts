@@ -4,8 +4,12 @@ import { stringFlow } from "@subflow/string";
 import { Methods, FlowReturn } from "@subflow/types/core";
 import { safer } from "@subflow/utils";
 import { BooleanFlowMethods } from "@subflow/types/flows";
+import { isError } from "@subflow/error";
 
-export const booleanFlow = <E extends Methods<boolean>>(value: boolean, methods?: E) => {
+export const booleanFlow = <E extends Methods<boolean>>(
+  value: boolean,
+  methods?: E
+) => {
   const defaultMethods: BooleanFlowMethods = {
     not(this: FlowReturn<boolean>) {
       return booleanFlow(!this.get(), methods);
@@ -62,11 +66,14 @@ export const booleanFlow = <E extends Methods<boolean>>(value: boolean, methods?
     }
   );
 
-  if (typeof init === "object" && "getError" in init && typeof init.isError === "boolean" && init.isError) {
+  if (isError(init)) {
     return init;
   }
 
-  return createFlow<boolean, typeof defaultMethods>(init as boolean, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow<boolean, typeof defaultMethods>(
+    init as boolean,
+    methods ? { ...defaultMethods, ...methods } : defaultMethods
+  );
 };
 
 export default booleanFlow;

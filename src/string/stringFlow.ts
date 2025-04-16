@@ -6,8 +6,12 @@ import { numberFlow } from "@subflow/number";
 import { arrayFlow } from "@subflow/array";
 import { objectFlow } from "@subflow/object";
 import { StringFlowMethods } from "@subflow/types/flows";
+import { isError } from "@subflow/error";
 
-export const stringFlow = <M extends Methods<string>>(value: string, methods?: M) => {
+export const stringFlow = <M extends Methods<string>>(
+  value: string,
+  methods?: M
+) => {
   const defaultMethods: StringFlowMethods = {
     toUpper(this: FlowReturn<string>) {
       return stringFlow(this.get().toUpperCase(), methods);
@@ -21,7 +25,11 @@ export const stringFlow = <M extends Methods<string>>(value: string, methods?: M
     reverse(this: FlowReturn<string>) {
       return stringFlow(this.get().split("").reverse().join(""), methods);
     },
-    replace<S extends string | RegExp, R extends string>(this: FlowReturn<string>, searchValue: S, replaceValue: R) {
+    replace<S extends string | RegExp, R extends string>(
+      this: FlowReturn<string>,
+      searchValue: S,
+      replaceValue: R
+    ) {
       return stringFlow(this.get().replace(searchValue, replaceValue), methods);
     },
     trim(this: FlowReturn<string>) {
@@ -105,9 +113,12 @@ export const stringFlow = <M extends Methods<string>>(value: string, methods?: M
     }
   );
 
-  if (typeof init === "object" && "getError" in init && typeof init.isError === "boolean" && init.isError) {
+  if (isError(init)) {
     return init;
   }
 
-  return createFlow(init as string, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow(
+    init as string,
+    methods ? { ...defaultMethods, ...methods } : defaultMethods
+  );
 };
