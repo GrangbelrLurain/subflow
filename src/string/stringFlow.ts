@@ -1,12 +1,11 @@
 import { createFlow } from "@subflow/core/createFlow";
-import { FlowReturn, Methods, SafeFlow } from "@subflow/types/core";
+import { Methods, SafeFlow } from "@subflow/types/core";
 import { booleanFlow } from "@subflow/boolean";
-import { safer } from "@subflow/utils";
 import { numberFlow } from "@subflow/number";
 import { arrayFlow } from "@subflow/array";
 import { objectFlow } from "@subflow/object";
 import { StringFlowMethods } from "@subflow/types/flows";
-import { isError } from "@subflow/error";
+import { errorFlow } from "@subflow/error";
 
 export const stringFlow = <M extends Methods<string>>(value: string, methods?: M) => {
   const defaultMethods: StringFlowMethods = {
@@ -88,30 +87,19 @@ export const stringFlow = <M extends Methods<string>>(value: string, methods?: M
     flowObject(this: SafeFlow<string>) {
       return objectFlow(JSON.parse(this.get()));
     },
+    ...(methods || {}),
   };
 
-  const init = safer<string, M & typeof defaultMethods>(
-    value,
-    (value: string): string => {
-      if (typeof value !== "string") {
-        throw new Error("Value must be a string");
-      }
+  const guard = booleanFlow(typeof value === "string");
 
-      return value;
-    },
-    {
+  if (guard.not().get()) {
+    return errorFlow<string, M & typeof defaultMethods>({
       type: "string",
       value,
       message: "Value must be a string",
       code: "STRING_FLOW_ERROR",
-      timestamp: Date.now(),
-      traceId: crypto.randomUUID(),
-    }
-  );
-
-  if (isError(init)) {
-    return init;
+    });
   }
 
-  return createFlow("string", init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow("string", value, defaultMethods);
 };

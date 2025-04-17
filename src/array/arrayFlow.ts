@@ -4,9 +4,8 @@ import { stringFlow } from "@subflow/string";
 import { Methods, SafeFlow } from "@subflow/types/core";
 import { ArrayFlowMethods, ElementOf, ArrayFlowReturn, NumberFlowReturn, BooleanFlowReturn, StringFlowReturn, ObjectFlowReturn, ObjectFlowMethods } from "@subflow/types/flows";
 import { numberFlow } from "@subflow/number";
-import { safer } from "@subflow/utils";
 import { booleanFlow } from "@subflow/boolean";
-import { errorFlow, isError } from "@subflow/error";
+import { errorFlow } from "@subflow/error";
 
 export const arrayFlow = <T extends any[], M extends Methods<any[]>>(value: T, methods?: M) => {
   const defaultMethods: ArrayFlowMethods<any[]> = {
@@ -134,28 +133,18 @@ export const arrayFlow = <T extends any[], M extends Methods<any[]>>(value: T, m
     ...(methods || {}),
   };
 
-  const init = safer<T, M & typeof defaultMethods>(
-    value,
-    (value: T): T => {
-      if (!Array.isArray(value)) {
-        throw new Error("Value must be an array");
-      }
+  const guard = booleanFlow(Array.isArray(value));
 
-      return value;
-    },
-    {
+  if (guard.not().get()) {
+    return errorFlow<T, M & typeof defaultMethods>({
       type: "array",
       value,
       message: "Value must be an array",
       code: "ARRAY_FLOW_ERROR",
-    }
-  );
-
-  if (isError(init)) {
-    return init;
+    });
   }
 
-  return createFlow("array", init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow("array", value, methods ? { ...defaultMethods, ...methods } : defaultMethods);
 };
 
 export default arrayFlow;

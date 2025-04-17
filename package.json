@@ -1,6 +1,6 @@
 {
   "name": "subflow",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "Safety your data flow in TypeScript with flow-based primitives.",
   "type": "module",
   "main": "dist/index.cjs",

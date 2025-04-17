@@ -1,9 +1,8 @@
 import { createFlow } from "@subflow/core/createFlow";
 import { stringFlow } from "@subflow/string/stringFlow";
 import { Methods, SafeFlow } from "@subflow/types/core";
-import { safer } from "@subflow/utils";
 import { NumberFlowMethods } from "@subflow/types/flows";
-import { isError } from "@subflow/error";
+import { errorFlow } from "@subflow/error";
 import { booleanFlow } from "@subflow/boolean";
 
 export const numberFlow = <M extends Methods<number>>(value: number, methods?: M) => {
@@ -86,28 +85,19 @@ export const numberFlow = <M extends Methods<number>>(value: number, methods?: M
     flowString(this: SafeFlow<number>, radix?: number) {
       return stringFlow(this.get().toString(radix));
     },
+    ...(methods || {}),
   };
 
-  const init = safer<number, M & typeof defaultMethods>(
-    value,
-    (value: number): number => {
-      if (typeof value !== "number") {
-        throw new Error("Value must be a number");
-      }
+  const guard = booleanFlow(typeof value === "number");
 
-      return value;
-    },
-    {
+  if (guard.not().get()) {
+    return errorFlow<number, M & typeof defaultMethods>({
       type: "number",
       value,
       message: "Value must be a number",
       code: "NUMBER_FLOW_ERROR",
-    }
-  );
-
-  if (isError(init)) {
-    return init;
+    });
   }
 
-  return createFlow("number", init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow("number", value, defaultMethods);
 };

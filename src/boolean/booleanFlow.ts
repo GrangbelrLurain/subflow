@@ -2,9 +2,8 @@ import { createFlow } from "@subflow/core/createFlow";
 import { numberFlow } from "@subflow/number";
 import { stringFlow } from "@subflow/string";
 import { Methods, FlowReturn } from "@subflow/types/core";
-import { safer } from "@subflow/utils";
-import { BooleanFlowMethods, BooleanFlowReturn } from "@subflow/types/flows";
-import { isError } from "@subflow/error";
+import { BooleanFlowMethods } from "@subflow/types/flows";
+import { errorFlow } from "@subflow/error";
 
 export const booleanFlow = <E extends Methods<boolean>>(value: boolean, methods?: E) => {
   const defaultMethods: BooleanFlowMethods = {
@@ -35,30 +34,21 @@ export const booleanFlow = <E extends Methods<boolean>>(value: boolean, methods?
     flowNumber(this: FlowReturn<boolean>) {
       return numberFlow(this.get() ? 1 : 0);
     },
+    ...(methods || {}),
   };
 
-  const init = safer<boolean, E & typeof defaultMethods>(
-    value,
-    (value: boolean): boolean => {
-      if (typeof value !== "boolean") {
-        throw new Error("Value must be a boolean");
-      }
+  const guard = booleanFlow(typeof value === "boolean");
 
-      return value;
-    },
-    {
+  if (guard.not().get()) {
+    return errorFlow<boolean, E & typeof defaultMethods>({
       type: "boolean",
       value,
       message: "Value must be a boolean",
       code: "BOOLEAN_FLOW_ERROR",
-    }
-  );
-
-  if (isError(init)) {
-    return init;
+    });
   }
 
-  return createFlow("boolean", init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow("boolean", value, defaultMethods);
 };
 
 export default booleanFlow;
