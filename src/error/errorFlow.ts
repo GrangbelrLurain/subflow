@@ -1,8 +1,7 @@
-import { FlowReturn, Methods } from "@subflow/types/core";
+import { Methods } from "@subflow/types/core";
 import { FlowErrorParams, ErrorFlow } from "@subflow/types/error";
-import ErrorManager from "./errorManager";
-
-export const IS_FLOW_ERROR = Symbol("isFlowError");
+import { ErrorManager } from "./errorManager";
+import { FLOW_TYPE, isErrorFlow } from "@subflow/meta/flowType";
 
 export const errorFlow = <T, M extends Methods<T> = {}>(error: FlowErrorParams<T>) => {
   const enrichedError: FlowErrorParams<T> = {
@@ -13,7 +12,7 @@ export const errorFlow = <T, M extends Methods<T> = {}>(error: FlowErrorParams<T
 
   const errorMonad = {
     _value: enrichedError.value,
-    isError: IS_FLOW_ERROR,
+    [FLOW_TYPE]: "error",
     getError: () => enrichedError,
     get: () => enrichedError.value,
   };
@@ -27,9 +26,12 @@ export const errorFlow = <T, M extends Methods<T> = {}>(error: FlowErrorParams<T
       }
       return () => undefined;
     },
-  }) as unknown as FlowReturn<T> & M;
+  }) as unknown as ErrorFlow<T> & M;
 };
 
-export function isError<T>(flow: any): flow is ErrorFlow<T> {
-  return flow?.isError === IS_FLOW_ERROR;
+export function isError<E>(flow: ErrorFlow<any> | E): flow is ErrorFlow<any> {
+  if (typeof flow === "object" && flow !== null && FLOW_TYPE in flow) {
+    return isErrorFlow(flow);
+  }
+  return false;
 }

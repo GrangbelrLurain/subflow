@@ -1,7 +1,7 @@
 import { arrayFlow } from "@subflow/array";
 import { booleanFlow } from "@subflow/boolean";
 import { createFlow } from "@subflow/core";
-import { Methods, FlowReturn } from "@subflow/types/core";
+import { Methods, SafeFlow } from "@subflow/types/core";
 import { safer } from "@subflow/utils";
 import { ObjectFlowMethods } from "@subflow/types/flows";
 import { stringFlow } from "@subflow/string";
@@ -9,27 +9,27 @@ import { isError } from "@subflow/error";
 
 export const objectFlow = <T extends object, M extends Methods<T>>(value: T, methods?: M) => {
   const defaultMethods: ObjectFlowMethods = {
-    keys(this: FlowReturn<T>) {
+    keys(this: SafeFlow<T>) {
       return arrayFlow(Object.keys(this.get()));
     },
-    values(this: FlowReturn<T>) {
+    values(this: SafeFlow<T>) {
       return arrayFlow(Object.values(this.get()));
     },
-    entries(this: FlowReturn<T>) {
+    entries(this: SafeFlow<T>) {
       return arrayFlow(Object.entries(this.get()));
     },
-    has(this: FlowReturn<T>, key: string) {
+    has(this: SafeFlow<T>, key: string) {
       return booleanFlow(this.get().hasOwnProperty(key));
     },
-    set(this: FlowReturn<T>, key: string, value: unknown) {
+    set(this: SafeFlow<T>, key: string, value: unknown) {
       return objectFlow({ ...this.get(), [key]: value }, methods);
     },
-    delete(this: FlowReturn<T>, key: string) {
+    delete(this: SafeFlow<T>, key: string) {
       const newObj = { ...this.get() };
       delete newObj[key as keyof T];
       return objectFlow(newObj, methods);
     },
-    flowString(this: FlowReturn<T>) {
+    flowString(this: SafeFlow<T>) {
       return stringFlow(JSON.stringify(this.get()));
     },
     ...(methods || {}),
@@ -56,5 +56,5 @@ export const objectFlow = <T extends object, M extends Methods<T>>(value: T, met
     return init;
   }
 
-  return createFlow(init as T, methods ? { ...defaultMethods, ...methods } : defaultMethods);
+  return createFlow("object", init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
 };

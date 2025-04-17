@@ -1,9 +1,11 @@
-import { IS_FLOW_ERROR } from "@subflow/error";
 import { FlowReturn, Methods } from "@subflow/types/core";
+import { FlowType } from "@subflow/types/meta";
+import { FLOW_TYPE } from "@subflow/meta/flowType";
 
-export const createFlow = <T extends any, E extends Methods<T> = {}>(init: T, methods?: E) => {
+export const createFlow = <F extends Exclude<FlowType, "error">, T extends any, E extends Methods<T> = {}>(flowType: F, init: T, methods?: E) => {
   const flowMonad = Object.create({
     ...(methods || {}),
+    [FLOW_TYPE]: flowType,
     get(this: { _value: T }) {
       return this._value;
     },

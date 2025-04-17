@@ -3,13 +3,10 @@ import { numberFlow } from "@subflow/number";
 import { stringFlow } from "@subflow/string";
 import { Methods, FlowReturn } from "@subflow/types/core";
 import { safer } from "@subflow/utils";
-import { BooleanFlowMethods } from "@subflow/types/flows";
+import { BooleanFlowMethods, BooleanFlowReturn } from "@subflow/types/flows";
 import { isError } from "@subflow/error";
 
-export const booleanFlow = <E extends Methods<boolean>>(
-  value: boolean,
-  methods?: E
-) => {
+export const booleanFlow = <E extends Methods<boolean>>(value: boolean, methods?: E) => {
   const defaultMethods: BooleanFlowMethods = {
     not(this: FlowReturn<boolean>) {
       return booleanFlow(!this.get(), methods);
@@ -20,6 +17,9 @@ export const booleanFlow = <E extends Methods<boolean>>(
     or(this: FlowReturn<boolean>, other: boolean) {
       return booleanFlow(this.get() || other, methods);
     },
+    nor(this: FlowReturn<boolean>, other: boolean) {
+      return booleanFlow(!this.get() || !other, methods);
+    },
     xor(this: FlowReturn<boolean>, other: boolean) {
       return booleanFlow(this.get() !== other, methods);
     },
@@ -28,18 +28,6 @@ export const booleanFlow = <E extends Methods<boolean>>(
     },
     equal(this: FlowReturn<boolean>, other: boolean) {
       return booleanFlow(this.get() === other, methods);
-    },
-    greaterThan(this: FlowReturn<boolean>, other: boolean) {
-      return booleanFlow(this.get() > other, methods);
-    },
-    lessThan(this: FlowReturn<boolean>, other: boolean) {
-      return booleanFlow(this.get() < other, methods);
-    },
-    greaterThanOrEqual(this: FlowReturn<boolean>, other: boolean) {
-      return booleanFlow(this.get() >= other, methods);
-    },
-    lessThanOrEqual(this: FlowReturn<boolean>, other: boolean) {
-      return booleanFlow(this.get() <= other, methods);
     },
     flowString(this: FlowReturn<boolean>) {
       return stringFlow(this.get().toString());
@@ -70,10 +58,7 @@ export const booleanFlow = <E extends Methods<boolean>>(
     return init;
   }
 
-  return createFlow<boolean, typeof defaultMethods>(
-    init as boolean,
-    methods ? { ...defaultMethods, ...methods } : defaultMethods
-  );
+  return createFlow("boolean", init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
 };
 
 export default booleanFlow;

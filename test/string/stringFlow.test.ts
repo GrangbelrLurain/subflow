@@ -1,5 +1,5 @@
 import { stringFlow as StringFlow } from "@subflow/string";
-import { stringFlow as StringFlowJS, isError as isErrorJS } from "@build/index.js";
+import { stringFlow as StringFlowJS, isError as isErrorJS } from "@build/index";
 import { stringFlow as StringFlowESM, isError as isErrorESM } from "@build/index.cjs";
 import { describe, it, expect } from "vitest";
 
@@ -119,11 +119,6 @@ const testStringFlow = (stringFlow: typeof StringFlow, isError: typeof isErrorES
         expect(flow.substring(6, 11).get()).toBe("world");
       });
 
-      it("substr: 문자열의 일부를 추출해야 합니다", () => {
-        const flow = stringFlow("hello world");
-        expect(flow.substr(6, 5).get()).toBe("world");
-      });
-
       it("split: 문자열을 특정 구분자로 분할해야 합니다", () => {
         const flow = stringFlow("hello,world");
         expect(flow.split(",").get()).toEqual(["hello", "world"]);
@@ -170,5 +165,5 @@ const testStringFlow = (stringFlow: typeof StringFlow, isError: typeof isErrorES
   });
 };
 
-testStringFlow(StringFlowJS as typeof StringFlow, isErrorJS);
-testStringFlow(StringFlowESM as typeof StringFlow, isErrorESM);
+testStringFlow(StringFlowJS as unknown as typeof StringFlow, isErrorJS);
+testStringFlow(StringFlowESM as unknown as typeof StringFlow, isErrorESM);

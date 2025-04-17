@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { arrayFlow as ArrayFlow } from "@subflow/array";
-import { arrayFlow as ArrayFlowJS, isError as isErrorJS } from "@build/index.js";
+
+import { arrayFlow as ArrayFlowJS, isError as isErrorJS } from "@build/index";
 import { arrayFlow as ArrayFlowESM, isError as isErrorESM } from "@build/index.cjs";
 
 const testArrayFlow = (arrayFlow: typeof ArrayFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
@@ -314,5 +315,5 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow, isError: typeof isErrorESM |
   });
 };
 
-testArrayFlow(ArrayFlowJS as typeof ArrayFlow, isErrorJS);
-testArrayFlow(ArrayFlowESM as typeof ArrayFlow, isErrorESM);
+testArrayFlow(ArrayFlowJS as unknown as typeof ArrayFlow, isErrorJS);
+testArrayFlow(ArrayFlowESM as unknown as typeof ArrayFlow, isErrorESM);

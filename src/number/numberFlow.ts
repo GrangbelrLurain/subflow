@@ -1,80 +1,89 @@
 import { createFlow } from "@subflow/core/createFlow";
 import { stringFlow } from "@subflow/string/stringFlow";
-import { Methods, FlowReturn } from "@subflow/types/core";
+import { Methods, SafeFlow } from "@subflow/types/core";
 import { safer } from "@subflow/utils";
 import { NumberFlowMethods } from "@subflow/types/flows";
 import { isError } from "@subflow/error";
+import { booleanFlow } from "@subflow/boolean";
 
-export const numberFlow = <M extends Methods<number>>(
-  value: number,
-  methods?: M
-) => {
+export const numberFlow = <M extends Methods<number>>(value: number, methods?: M) => {
   const defaultMethods: NumberFlowMethods = {
-    add(this: FlowReturn<number>, num: number) {
+    add(this: SafeFlow<number>, num: number) {
       return numberFlow(this.get() + num);
     },
-    subtract(this: FlowReturn<number>, num: number) {
+    subtract(this: SafeFlow<number>, num: number) {
       return numberFlow(this.get() - num);
     },
-    multiply(this: FlowReturn<number>, num: number) {
+    multiply(this: SafeFlow<number>, num: number) {
       return numberFlow(this.get() * num);
     },
-    divide(this: FlowReturn<number>, num: number) {
+    divide(this: SafeFlow<number>, num: number) {
       return numberFlow(this.get() / num);
     },
-    modulo(this: FlowReturn<number>, num: number) {
+    modulo(this: SafeFlow<number>, num: number) {
       return numberFlow(this.get() % num);
     },
-    power(this: FlowReturn<number>, num: number) {
+    power(this: SafeFlow<number>, num: number) {
       return numberFlow(this.get() ** num);
     },
-    sqrt(this: FlowReturn<number>) {
+    sqrt(this: SafeFlow<number>) {
       return numberFlow(Math.sqrt(this.get()));
     },
-    round(this: FlowReturn<number>) {
+    round(this: SafeFlow<number>) {
       return numberFlow(Math.round(this.get()));
     },
-    floor(this: FlowReturn<number>) {
+    floor(this: SafeFlow<number>) {
       return numberFlow(Math.floor(this.get()));
     },
-    ceil(this: FlowReturn<number>) {
+    ceil(this: SafeFlow<number>) {
       return numberFlow(Math.ceil(this.get()));
     },
-    abs(this: FlowReturn<number>) {
+    abs(this: SafeFlow<number>) {
       return numberFlow(Math.abs(this.get()));
     },
-    random(this: FlowReturn<number>) {
+    random(this: SafeFlow<number>) {
       return numberFlow(Math.random());
     },
-    min(this: FlowReturn<number>, num: number) {
+    min(this: SafeFlow<number>, num: number) {
       return numberFlow(Math.min(this.get(), num));
     },
-    max(this: FlowReturn<number>, num: number) {
+    max(this: SafeFlow<number>, num: number) {
       return numberFlow(Math.max(this.get(), num));
     },
-    clamp(this: FlowReturn<number>, min: number, max: number) {
+    clamp(this: SafeFlow<number>, min: number, max: number) {
       return numberFlow(Math.min(Math.max(this.get(), min), max));
     },
-    sign(this: FlowReturn<number>) {
+    sign(this: SafeFlow<number>) {
       return numberFlow(Math.sign(this.get()));
     },
-    toFixed(this: FlowReturn<number>, digits?: number) {
+    toFixed(this: SafeFlow<number>, digits?: number) {
       return stringFlow(this.get().toFixed(digits));
     },
-    toExponential(this: FlowReturn<number>, digits?: number) {
+    toExponential(this: SafeFlow<number>, digits?: number) {
       return stringFlow(this.get().toExponential(digits));
     },
-    toPrecision(this: FlowReturn<number>, precision?: number) {
+    toPrecision(this: SafeFlow<number>, precision?: number) {
       return stringFlow(this.get().toPrecision(precision));
     },
-    flowLocaleString(
-      this: FlowReturn<number>,
-      locales: string | string[],
-      options?: Intl.NumberFormatOptions
-    ) {
+    lessThan(this: SafeFlow<number>, num: number) {
+      return booleanFlow(this.get() < num);
+    },
+    greaterThan(this: SafeFlow<number>, num: number) {
+      return booleanFlow(this.get() > num);
+    },
+    lessThanOrEqual(this: SafeFlow<number>, num: number) {
+      return booleanFlow(this.get() <= num);
+    },
+    greaterThanOrEqual(this: SafeFlow<number>, num: number) {
+      return booleanFlow(this.get() >= num);
+    },
+    flowBoolean(this: SafeFlow<number>) {
+      return booleanFlow(this.get() !== 0);
+    },
+    flowLocaleString(this: SafeFlow<number>, locales: string | string[], options?: Intl.NumberFormatOptions) {
       return stringFlow(this.get().toLocaleString(locales, options));
     },
-    flowString(this: FlowReturn<number>, radix?: number) {
+    flowString(this: SafeFlow<number>, radix?: number) {
       return stringFlow(this.get().toString(radix));
     },
   };
@@ -100,8 +109,5 @@ export const numberFlow = <M extends Methods<number>>(
     return init;
   }
 
-  return createFlow(
-    init as number,
-    methods ? { ...defaultMethods, ...methods } : defaultMethods
-  );
+  return createFlow("number", init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
 };

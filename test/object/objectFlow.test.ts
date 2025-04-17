@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { objectFlow as ObjectFlow } from "@subflow/index";
-import { objectFlow as ObjectFlowJS, isError as isErrorJS } from "@build/index.js";
+import { objectFlow as ObjectFlowJS, isError as isErrorJS } from "@build/index";
 import { objectFlow as ObjectFlowESM, isError as isErrorESM } from "@build/index.cjs";
 
 const testObjectFlow = (objectFlow: typeof ObjectFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
@@ -107,5 +107,5 @@ const testObjectFlow = (objectFlow: typeof ObjectFlow, isError: typeof isErrorES
   });
 };
 
-testObjectFlow(ObjectFlowJS as typeof ObjectFlow, isErrorJS);
-testObjectFlow(ObjectFlowESM as typeof ObjectFlow, isErrorESM);
+testObjectFlow(ObjectFlowJS as unknown as typeof ObjectFlow, isErrorJS);
+testObjectFlow(ObjectFlowESM as unknown as typeof ObjectFlow, isErrorESM);

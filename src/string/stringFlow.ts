@@ -1,5 +1,5 @@
 import { createFlow } from "@subflow/core/createFlow";
-import { FlowReturn, Methods } from "@subflow/types/core";
+import { FlowReturn, Methods, SafeFlow } from "@subflow/types/core";
 import { booleanFlow } from "@subflow/boolean";
 import { safer } from "@subflow/utils";
 import { numberFlow } from "@subflow/number";
@@ -8,88 +8,84 @@ import { objectFlow } from "@subflow/object";
 import { StringFlowMethods } from "@subflow/types/flows";
 import { isError } from "@subflow/error";
 
-export const stringFlow = <M extends Methods<string>>(
-  value: string,
-  methods?: M
-) => {
+export const stringFlow = <M extends Methods<string>>(value: string, methods?: M) => {
   const defaultMethods: StringFlowMethods = {
-    toUpper(this: FlowReturn<string>) {
+    toUpper(this: SafeFlow<string>) {
       return stringFlow(this.get().toUpperCase(), methods);
     },
-    toLower(this: FlowReturn<string>) {
+    toLower(this: SafeFlow<string>) {
       return stringFlow(this.get().toLowerCase(), methods);
     },
-    length(this: FlowReturn<string>) {
+    length(this: SafeFlow<string>) {
       return numberFlow(this.get().length);
     },
-    reverse(this: FlowReturn<string>) {
+    reverse(this: SafeFlow<string>) {
       return stringFlow(this.get().split("").reverse().join(""), methods);
     },
-    replace<S extends string | RegExp, R extends string>(
-      this: FlowReturn<string>,
-      searchValue: S,
-      replaceValue: R
-    ) {
+    replace<S extends string | RegExp, R extends string>(this: SafeFlow<string>, searchValue: S, replaceValue: R) {
       return stringFlow(this.get().replace(searchValue, replaceValue), methods);
     },
-    trim(this: FlowReturn<string>) {
+    trim(this: SafeFlow<string>) {
       return stringFlow(this.get().trim(), methods);
     },
-    padStart(this: FlowReturn<string>, length: number, fillString?: string) {
+    padStart(this: SafeFlow<string>, length: number, fillString?: string) {
       return stringFlow(this.get().padStart(length, fillString), methods);
     },
-    padEnd(this: FlowReturn<string>, length: number, fillString?: string) {
+    padEnd(this: SafeFlow<string>, length: number, fillString?: string) {
       return stringFlow(this.get().padEnd(length, fillString), methods);
     },
-    startsWith(this: FlowReturn<string>, searchString: string) {
+    startsWith(this: SafeFlow<string>, searchString: string) {
       return booleanFlow(this.get().startsWith(searchString));
     },
-    endsWith(this: FlowReturn<string>, searchString: string) {
+    endsWith(this: SafeFlow<string>, searchString: string) {
       return booleanFlow(this.get().endsWith(searchString));
     },
-    includes(this: FlowReturn<string>, searchString: string) {
+    includes(this: SafeFlow<string>, searchString: string) {
       return booleanFlow(this.get().includes(searchString));
     },
-    indexOf(this: FlowReturn<string>, searchString: string) {
+    indexOf(this: SafeFlow<string>, searchString: string) {
       return numberFlow(this.get().indexOf(searchString));
     },
-    lastIndexOf(this: FlowReturn<string>, searchString: string) {
+    lastIndexOf(this: SafeFlow<string>, searchString: string) {
       return numberFlow(this.get().lastIndexOf(searchString));
     },
-    charAt(this: FlowReturn<string>, index: number) {
+    charAt(this: SafeFlow<string>, index: number) {
       return stringFlow(this.get().charAt(index), methods);
     },
-    charCodeAt(this: FlowReturn<string>, index: number) {
+    charCodeAt(this: SafeFlow<string>, index: number) {
       return numberFlow(this.get().charCodeAt(index));
     },
-    concat(this: FlowReturn<string>, ...strings: string[]) {
+    concat(this: SafeFlow<string>, ...strings: string[]) {
       return stringFlow(this.get().concat(...strings), methods);
     },
-    split<S extends string | RegExp>(this: FlowReturn<string>, separator: S) {
+    split<S extends string | RegExp>(this: SafeFlow<string>, separator: S) {
       return arrayFlow(this.get().split(separator));
     },
-    slice(this: FlowReturn<string>, start?: number, end?: number) {
+    slice(this: SafeFlow<string>, start?: number, end?: number) {
       return stringFlow(this.get().slice(start, end), methods);
     },
-    substring(this: FlowReturn<string>, start: number, end?: number) {
+    substring(this: SafeFlow<string>, start: number, end?: number) {
       return stringFlow(this.get().substring(start, end), methods);
     },
-    substr(this: FlowReturn<string>, start: number, length?: number) {
-      return stringFlow(this.get().substr(start, length), methods);
+    equals(this: SafeFlow<string>, other: string) {
+      return booleanFlow(this.get() === other);
     },
-    flowNumber(this: FlowReturn<string>) {
+    notEqual(this: SafeFlow<string>, other: string) {
+      return booleanFlow(this.get() !== other);
+    },
+    flowNumber(this: SafeFlow<string>) {
       return numberFlow(Number(this.get()));
     },
-    flowFloatNumber(this: FlowReturn<string>) {
+    flowFloatNumber(this: SafeFlow<string>) {
       return numberFlow(Number(this.get()));
     },
-    flowBoolean(this: FlowReturn<string>) {
+    flowBoolean(this: SafeFlow<string>) {
       return booleanFlow(Boolean(this.get()));
     },
-    flowArray(this: FlowReturn<string>) {
+    flowArray(this: SafeFlow<string>) {
       return arrayFlow(this.get().split(""));
     },
-    flowObject(this: FlowReturn<string>) {
+    flowObject(this: SafeFlow<string>) {
       return objectFlow(JSON.parse(this.get()));
     },
   };
@@ -117,8 +113,5 @@ export const stringFlow = <M extends Methods<string>>(
     return init;
   }
 
-  return createFlow(
-    init as string,
-    methods ? { ...defaultMethods, ...methods } : defaultMethods
-  );
+  return createFlow("string", init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
 };

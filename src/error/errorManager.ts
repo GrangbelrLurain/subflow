@@ -1,6 +1,6 @@
 import { FlowErrorParams } from "@subflow/types/error";
 
-class ErrorManager {
+export class ErrorManager {
   private static errors: FlowErrorParams<any>[] = [];
 
   public static add(error: FlowErrorParams<any>) {
@@ -15,5 +15,3 @@ class ErrorManager {
     this.errors = [];
   }
 }
-
-export default ErrorManager;

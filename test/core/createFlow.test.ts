@@ -1,7 +1,7 @@
 // test/createMonad.test.ts
 import { describe, it, expect } from "vitest";
 import { createFlow as CreateFlow, safer as Safer, FlowReturn } from "@subflow/index";
-import { createFlow as CreateFlowJS, safer as SaferJS, isError as isErrorJS, errorFlow as ErrorFlowJS } from "@build/index.js";
+import { createFlow as CreateFlowJS, safer as SaferJS, isError as isErrorJS, errorFlow as ErrorFlowJS } from "@build/index";
 import { createFlow as CreateFlowESM, safer as SaferESM, isError as isErrorESM, errorFlow as ErrorFlowESM } from "@build/index.cjs";
 import { errorFlow as ErrorFlow } from "@subflow/error";
 
@@ -19,7 +19,7 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
           traceId: "traceId",
         });
 
-        const flow = createFlow(init, {});
+        const flow = createFlow("string", init, {});
         expect(flow.get()).toBe("test value");
       });
 
@@ -34,7 +34,7 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
           traceId: "traceId",
         });
 
-        const flow = createFlow(init, {});
+        const flow = createFlow("string", init, {});
         expect(isError(flow)).toBe(false);
       });
 
@@ -63,7 +63,7 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
           traceId: "traceId",
         });
 
-        const flow = createFlow(init, {});
+        const flow = createFlow("string", init, {});
         expect(flow.getError()).toBe(undefined);
       });
     });
@@ -86,7 +86,7 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
           traceId: "traceId",
         });
 
-        const flow = createFlow(init, extensions as any);
+        const flow = createFlow("string", init, extensions as any);
         expect(flow.customMethod()).toBe(10); // 'test value'의 길이
       });
 
@@ -123,7 +123,7 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
           traceId: "traceId",
         });
 
-        const flow = createFlow(init, {});
+        const flow = createFlow("string", init, {});
 
         // flow 내부의 _value 속성은 writable: false로 설정되어 있음
         try {
@@ -142,5 +142,5 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
   });
 };
 
-testCreateFlow(CreateFlowJS as typeof CreateFlow, SaferJS as typeof Safer, isErrorJS, ErrorFlowJS as typeof ErrorFlow);
-testCreateFlow(CreateFlowESM as typeof CreateFlow, SaferESM as typeof Safer, isErrorESM, ErrorFlowESM as typeof ErrorFlow);
+testCreateFlow(CreateFlowJS as unknown as typeof CreateFlow, SaferJS as unknown as typeof Safer, isErrorJS, ErrorFlowJS as unknown as typeof ErrorFlow);
+testCreateFlow(CreateFlowESM as unknown as typeof CreateFlow, SaferESM as unknown as typeof Safer, isErrorESM, ErrorFlowESM as unknown as typeof ErrorFlow);

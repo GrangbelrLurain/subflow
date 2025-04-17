@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { numberFlow as NumberFlow } from "@subflow/number";
-import { numberFlow as NumberFlowJS } from "@build/index.js";
+import { numberFlow as NumberFlowJS } from "@build/index";
 import { numberFlow as NumberFlowESM } from "@build/index.cjs";
 import { isError } from "@subflow/error";
 
@@ -144,5 +144,5 @@ const testNumberFlow = (numberFlow: typeof NumberFlow) => {
   });
 };
 
-testNumberFlow(NumberFlowJS as typeof NumberFlow);
-testNumberFlow(NumberFlowESM as typeof NumberFlow);
+testNumberFlow(NumberFlowJS as unknown as typeof NumberFlow);
+testNumberFlow(NumberFlowESM as unknown as typeof NumberFlow);

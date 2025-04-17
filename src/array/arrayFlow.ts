@@ -1,98 +1,56 @@
 import { createFlow } from "@subflow/core";
 import { objectFlow } from "@subflow/object";
 import { stringFlow } from "@subflow/string";
-import { Methods, FlowReturn } from "@subflow/types/core";
-import {
-  ArrayFlowMethods,
-  ElementOf,
-  ArrayFlowReturn,
-  NumberFlowReturn,
-  BooleanFlowReturn,
-  StringFlowReturn,
-  ObjectFlowReturn,
-  ObjectFlowMethods,
-} from "@subflow/types/flows";
+import { Methods, SafeFlow } from "@subflow/types/core";
+import { ArrayFlowMethods, ElementOf, ArrayFlowReturn, NumberFlowReturn, BooleanFlowReturn, StringFlowReturn, ObjectFlowReturn, ObjectFlowMethods } from "@subflow/types/flows";
 import { numberFlow } from "@subflow/number";
 import { safer } from "@subflow/utils";
 import { booleanFlow } from "@subflow/boolean";
 import { errorFlow, isError } from "@subflow/error";
 
-export const arrayFlow = <T extends any[], M extends Methods<any[]>>(
-  value: T,
-  methods?: M
-) => {
+export const arrayFlow = <T extends any[], M extends Methods<any[]>>(value: T, methods?: M) => {
   const defaultMethods: ArrayFlowMethods<any[]> = {
-    push(this: FlowReturn<T>, ...items: any[]): ArrayFlowReturn<any[]> {
+    push(this: SafeFlow<T>, ...items: any[]): ArrayFlowReturn<any[]> {
       return arrayFlow([...this.get(), ...items], methods);
     },
-    pop(this: FlowReturn<T>): ArrayFlowReturn<T> {
+    pop(this: SafeFlow<T>): ArrayFlowReturn<T> {
       const last = this.get();
       return arrayFlow(last.slice(0, -1), methods);
     },
-    shift(this: FlowReturn<T>): ArrayFlowReturn<T> {
+    shift(this: SafeFlow<T>): ArrayFlowReturn<T> {
       return arrayFlow(this.get().slice(1), methods);
     },
-    unshift(this: FlowReturn<T>, items: ElementOf<T>[]): ArrayFlowReturn<T> {
+    unshift(this: SafeFlow<T>, items: ElementOf<T>[]): ArrayFlowReturn<T> {
       return arrayFlow([...items, ...this.get()], methods);
     },
-    join(this: FlowReturn<T>, separator: string): StringFlowReturn {
+    join(this: SafeFlow<T>, separator: string): StringFlowReturn {
       return stringFlow(this.get().join(separator));
     },
-    map<U>(
-      this: FlowReturn<T>,
-      callback: (value: T[number], index: number, array: ElementOf<T>[]) => U
-    ): ArrayFlowReturn<U[]> {
+    map<U>(this: SafeFlow<T>, callback: (value: T[number], index: number, array: ElementOf<T>[]) => U): ArrayFlowReturn<U[]> {
       return arrayFlow(this.get().map(callback), methods);
     },
-    filter(
-      this: FlowReturn<T>,
-      callback: (
-        value: T[number],
-        index: number,
-        array: ElementOf<T>[]
-      ) => boolean
-    ): ArrayFlowReturn<ElementOf<T>[]> {
+    filter(this: SafeFlow<T>, callback: (value: T[number], index: number, array: ElementOf<T>[]) => boolean): ArrayFlowReturn<ElementOf<T>[]> {
       return arrayFlow(this.get().filter(callback), methods);
     },
-    reduce(
-      this: FlowReturn<T>,
-      callback: (
-        acc: ElementOf<T>,
-        value: ElementOf<T>,
-        index: number,
-        array: ElementOf<T>[]
-      ) => ElementOf<T>,
-      initialValue: ElementOf<T>
-    ): ElementOf<T> {
+    reduce(this: SafeFlow<T>, callback: (acc: ElementOf<T>, value: ElementOf<T>, index: number, array: ElementOf<T>[]) => ElementOf<T>, initialValue: ElementOf<T>): ElementOf<T> {
       return this.get().reduce(callback, initialValue);
     },
-    sort(
-      this: FlowReturn<T>,
-      compareFunction?: (a: ElementOf<T>, b: ElementOf<T>) => number
-    ): ArrayFlowReturn<T> {
+    sort(this: SafeFlow<T>, compareFunction?: (a: ElementOf<T>, b: ElementOf<T>) => number): ArrayFlowReturn<T> {
       return arrayFlow(this.get().toSorted(compareFunction), methods);
     },
-    reverse(this: FlowReturn<T>): ArrayFlowReturn<T> {
+    reverse(this: SafeFlow<T>): ArrayFlowReturn<T> {
       return arrayFlow(
         this.get().reduce((acc, item) => [item, ...acc], []),
         methods
       );
     },
-    concat(
-      this: FlowReturn<T>,
-      ...arrays: ElementOf<T>[]
-    ): ArrayFlowReturn<ElementOf<T>[]> {
+    concat(this: SafeFlow<T>, ...arrays: ElementOf<T>[]): ArrayFlowReturn<ElementOf<T>[]> {
       return arrayFlow(this.get().concat(...arrays), methods);
     },
-    slice(this: FlowReturn<T>, start: number, end: number): ArrayFlowReturn<T> {
+    slice(this: SafeFlow<T>, start: number, end: number): ArrayFlowReturn<T> {
       return arrayFlow(this.get().slice(start, end), methods);
     },
-    splice(
-      this: FlowReturn<T>,
-      start: number,
-      deleteCount: number,
-      ...items: ElementOf<T>[]
-    ): ArrayFlowReturn<ElementOf<T>[]> {
+    splice(this: SafeFlow<T>, start: number, deleteCount: number, ...items: ElementOf<T>[]): ArrayFlowReturn<ElementOf<T>[]> {
       return arrayFlow(
         this.get().reduce((acc, item, index) => {
           if (index === start) {
@@ -106,90 +64,42 @@ export const arrayFlow = <T extends any[], M extends Methods<any[]>>(
         methods
       );
     },
-    indexOf(
-      this: FlowReturn<T>,
-      searchElement: ElementOf<T>,
-      fromIndex?: number
-    ): NumberFlowReturn {
+    indexOf(this: SafeFlow<T>, searchElement: ElementOf<T>, fromIndex?: number): NumberFlowReturn {
       return numberFlow(this.get().indexOf(searchElement, fromIndex));
     },
-    findLastIndex(
-      this: FlowReturn<T>,
-      searchElement: ElementOf<T>
-    ): NumberFlowReturn {
-      const lastIndex = this.get().findLastIndex(
-        (item) => item === searchElement
-      );
+    findLastIndex(this: SafeFlow<T>, searchElement: ElementOf<T>): NumberFlowReturn {
+      const lastIndex = this.get().findLastIndex((item) => item === searchElement);
       return numberFlow(lastIndex);
     },
-    includes(
-      this: FlowReturn<T>,
-      searchElement: ElementOf<T>,
-      fromIndex?: number
-    ): BooleanFlowReturn {
+    includes(this: SafeFlow<T>, searchElement: ElementOf<T>, fromIndex?: number): BooleanFlowReturn {
       return booleanFlow(this.get().includes(searchElement, fromIndex));
     },
-    find(
-      this: FlowReturn<T>,
-      callback: (
-        value: ElementOf<T>,
-        index: number,
-        array: ElementOf<T>[]
-      ) => boolean
-    ): ElementOf<T> {
+    find(this: SafeFlow<T>, callback: (value: ElementOf<T>, index: number, array: ElementOf<T>[]) => boolean): ElementOf<T> {
       return this.get().find(callback);
     },
-    findIndex(
-      this: FlowReturn<T>,
-      callback: (
-        value: ElementOf<T>,
-        index: number,
-        array: ElementOf<T>[]
-      ) => boolean
-    ): NumberFlowReturn {
+    findIndex(this: SafeFlow<T>, callback: (value: ElementOf<T>, index: number, array: ElementOf<T>[]) => boolean): NumberFlowReturn {
       return numberFlow(this.get().findIndex(callback));
     },
-    forEach(
-      this: FlowReturn<T>,
-      callback: (
-        value: ElementOf<T>,
-        index: number,
-        array: ElementOf<T>[]
-      ) => void
-    ): ArrayFlowReturn<ElementOf<T>[]> {
+    forEach(this: SafeFlow<T>, callback: (value: ElementOf<T>, index: number, array: ElementOf<T>[]) => void): ArrayFlowReturn<ElementOf<T>[]> {
       this.get().forEach(callback);
       return arrayFlow(this.get(), methods);
     },
-    every(
-      this: FlowReturn<T>,
-      callback: (
-        value: ElementOf<T>,
-        index: number,
-        array: ElementOf<T>[]
-      ) => boolean
-    ): BooleanFlowReturn {
+    every(this: SafeFlow<T>, callback: (value: ElementOf<T>, index: number, array: ElementOf<T>[]) => boolean): BooleanFlowReturn {
       return booleanFlow(this.get().every(callback));
     },
-    some(
-      this: FlowReturn<T>,
-      callback: (
-        value: ElementOf<T>,
-        index: number,
-        array: ElementOf<T>[]
-      ) => boolean
-    ): BooleanFlowReturn {
+    some(this: SafeFlow<T>, callback: (value: ElementOf<T>, index: number, array: ElementOf<T>[]) => boolean): BooleanFlowReturn {
       return booleanFlow(this.get().some(callback));
     },
-    flowString(this: FlowReturn<T>): StringFlowReturn {
+    flowString(this: SafeFlow<T>): StringFlowReturn {
       return stringFlow(this.get().toString());
     },
-    flowLocaleString(this: FlowReturn<T>): StringFlowReturn {
+    flowLocaleString(this: SafeFlow<T>): StringFlowReturn {
       return stringFlow(this.get().toLocaleString());
     },
-    flowStringfy(this: FlowReturn<T>): StringFlowReturn {
+    flowStringfy(this: SafeFlow<T>): StringFlowReturn {
       return stringFlow(JSON.stringify(this.get()));
     },
-    flowObject(this: FlowReturn<T>): ObjectFlowReturn {
+    flowObject(this: SafeFlow<T>): ObjectFlowReturn {
       try {
         return objectFlow(Object.fromEntries(Object.entries(this.get())));
       } catch (e) {
@@ -202,7 +112,7 @@ export const arrayFlow = <T extends any[], M extends Methods<any[]>>(
         });
       }
     },
-    flowObjectEntries(this: FlowReturn<T>): ObjectFlowReturn {
+    flowObjectEntries(this: SafeFlow<T>): ObjectFlowReturn {
       try {
         return objectFlow(Object.fromEntries(this.get()));
       } catch (e) {
@@ -215,10 +125,10 @@ export const arrayFlow = <T extends any[], M extends Methods<any[]>>(
         });
       }
     },
-    flowBoolean(this: FlowReturn<T>): BooleanFlowReturn {
+    flowBoolean(this: SafeFlow<T>): BooleanFlowReturn {
       return booleanFlow(this.get().length > 0);
     },
-    flowNumber(this: FlowReturn<T>): NumberFlowReturn {
+    flowNumber(this: SafeFlow<T>): NumberFlowReturn {
       return numberFlow(this.get().length);
     },
     ...(methods || {}),
@@ -245,7 +155,7 @@ export const arrayFlow = <T extends any[], M extends Methods<any[]>>(
     return init;
   }
 
-  return createFlow<T, typeof defaultMethods>(init as T, defaultMethods);
+  return createFlow("array", init, methods ? { ...defaultMethods, ...methods } : defaultMethods);
 };
 
 export default arrayFlow;

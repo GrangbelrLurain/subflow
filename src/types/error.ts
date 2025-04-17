@@ -1,11 +1,11 @@
-import { FlowType } from "./core";
-import { IS_FLOW_ERROR } from "@subflow/error";
+import { FLOW_TYPE } from "@subflow/meta/flowType";
+import { FlowType } from "./meta";
 
 export interface FlowErrorParams<T> {
   readonly type: FlowType;
   readonly value: T;
   readonly message: string;
-  readonly code: string;
+  readonly code?: string;
   readonly timestamp?: number;
   readonly traceId?: string;
   readonly stack?: string;
@@ -13,7 +13,7 @@ export interface FlowErrorParams<T> {
 }
 
 export type ErrorFlow<T> = {
-  isError: typeof IS_FLOW_ERROR;
+  [FLOW_TYPE]: "error";
   getError: () => FlowErrorParams<T>;
   get: () => T;
 };

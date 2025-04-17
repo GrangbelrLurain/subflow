@@ -1,4 +1,5 @@
-import { FlowErrorParams, ErrorFlow } from "@subflow/types/error";
+import { FLOW_TYPE } from "@subflow/meta/flowType";
+import { ErrorFlow, FlowType } from "@subflow/types";
 /**
  * 단일 확장 메서드의 타입 정의
  * @template T 확장 메서드가 적용될 객체 타입
@@ -14,16 +15,14 @@ export type Method<T, Args extends any[] = any[], Return = any> = (this: Default
  */
 export type Methods<T, EM extends Record<string, Method<T>> = Record<string, Method<T>>> = EM;
 
-export type DefaultExtensions<T> =
-  | {
-      get: () => T;
-      getError: () => undefined;
-      isError: false;
-    }
-  | ErrorFlow<T>;
+export type SafeFlow<T> = {
+  [FLOW_TYPE]: Exclude<FlowType, "error">;
+  get: () => T;
+  getError: () => undefined;
+};
+
+export type DefaultExtensions<T> = SafeFlow<T> | ErrorFlow<T>;
 
 export type FlowReturn<T> = DefaultExtensions<T>;
 
 export type Flow<T> = (value: T) => FlowReturn<T>;
-
-export type FlowType = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "array";

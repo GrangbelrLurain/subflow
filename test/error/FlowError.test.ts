@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { errorFlow as ErrorFlow, isError } from "@subflow/error";
-import { errorFlow as ErrorFlowESM } from "@build/index.cjs";
-import { errorFlow as ErrorFlowJS } from "@build/index.js";
+import { errorFlow as ErrorFlowESM, ErrorManager as ErrorManagerESM } from "@build/index.cjs";
+import { errorFlow as ErrorFlowJS, ErrorManager as ErrorManagerJS } from "@build/index";
 
-const testFlowError = (errorFlow: typeof ErrorFlow<any>) => {
+const testFlowError = (errorFlow: typeof ErrorFlow<any>, ErrorManager: typeof ErrorManagerESM | typeof ErrorManagerJS) => {
   describe("FlowError", () => {
     it("FlowError 인스턴스를 생성해야 합니다", () => {
       const error = errorFlow({ type: "string", value: "test", message: "테스트 오류", code: "TEST_ERROR", timestamp: Date.now(), traceId: "traceId" });
@@ -34,7 +34,22 @@ const testFlowError = (errorFlow: typeof ErrorFlow<any>) => {
       }
     });
   });
+
+  describe("ErrorManager 메서드", () => {
+    it("add: 오류를 추가해야 합니다", () => {
+      const error = errorFlow({ type: "string", value: "test", message: "테스트 오류", code: "TEST_ERROR", timestamp: Date.now(), traceId: "traceId" });
+      ErrorManager.add(error.getError());
+      expect(ErrorManager.view()).toContain(error.getError());
+    });
+
+    it("clear: 오류를 초기화해야 합니다", () => {
+      const error = errorFlow({ type: "string", value: "test", message: "테스트 오류", code: "TEST_ERROR", timestamp: Date.now(), traceId: "traceId" });
+      ErrorManager.add(error.getError());
+      ErrorManager.clear();
+      expect(ErrorManager.view()).toEqual([]);
+    });
+  });
 };
 
-testFlowError(ErrorFlowESM as typeof ErrorFlow<any>);
-testFlowError(ErrorFlowJS as typeof ErrorFlow<any>);
+testFlowError(ErrorFlowESM as unknown as typeof ErrorFlow<any>, ErrorManagerESM);
+testFlowError(ErrorFlowJS as unknown as typeof ErrorFlow<any>, ErrorManagerJS);

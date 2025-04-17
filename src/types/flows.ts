@@ -23,7 +23,8 @@ export type StringFlowMethods = {
   split<S extends string | RegExp>(this: FlowReturn<string>, separator: S): ArrayFlowReturn<string[]>;
   slice(this: FlowReturn<string>, start?: number, end?: number): StringFlowReturn;
   substring(this: FlowReturn<string>, start: number, end?: number): StringFlowReturn;
-  substr(this: FlowReturn<string>, start: number, length?: number): StringFlowReturn;
+  equals(this: FlowReturn<string>, other: string): BooleanFlowReturn;
+  notEqual(this: FlowReturn<string>, other: string): BooleanFlowReturn;
   flowNumber(this: FlowReturn<string>): NumberFlowReturn;
   flowFloatNumber(this: FlowReturn<string>): NumberFlowReturn;
   flowBoolean(this: FlowReturn<string>): BooleanFlowReturn;
@@ -53,6 +54,11 @@ export type NumberFlowMethods = {
   toFixed(this: FlowReturn<number>, digits?: number): StringFlowReturn;
   toExponential(this: FlowReturn<number>, digits?: number): StringFlowReturn;
   toPrecision(this: FlowReturn<number>, precision?: number): StringFlowReturn;
+  lessThan(this: FlowReturn<number>, num: number): BooleanFlowReturn;
+  greaterThan(this: FlowReturn<number>, num: number): BooleanFlowReturn;
+  lessThanOrEqual(this: FlowReturn<number>, num: number): BooleanFlowReturn;
+  greaterThanOrEqual(this: FlowReturn<number>, num: number): BooleanFlowReturn;
+  flowBoolean(this: FlowReturn<number>): BooleanFlowReturn;
   flowString(this: FlowReturn<number>, radix?: number): StringFlowReturn;
   flowLocaleString(this: FlowReturn<number>, locales: string | string[], options?: Intl.NumberFormatOptions): StringFlowReturn;
 };
@@ -64,12 +70,9 @@ export type BooleanFlowMethods = {
   and(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
   or(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
   xor(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
+  nor(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
   notEqual(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
   equal(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
-  greaterThan(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
-  lessThan(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
-  greaterThanOrEqual(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
-  lessThanOrEqual(this: FlowReturn<boolean>, other: boolean): BooleanFlowReturn;
   flowString(this: FlowReturn<boolean>): StringFlowReturn;
   flowNumber(this: FlowReturn<boolean>): NumberFlowReturn;
 };

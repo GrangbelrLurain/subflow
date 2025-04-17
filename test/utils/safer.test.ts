@@ -1,5 +1,5 @@
 import { safer as Safer } from "@subflow/index";
-import { safer as SaferJS, isError as isErrorJS } from "@build/index.js";
+import { safer as SaferJS, isError as isErrorJS } from "@build/index";
 import { safer as SaferESM, isError as isErrorESM } from "@build/index.cjs";
 import { describe, it, expect } from "vitest";
 

@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { booleanFlow as BooleanFlow } from "@subflow/boolean";
-import { booleanFlow as BooleanFlowJS, isError as isErrorJS } from "@build/index.js";
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+import { booleanFlow as BooleanFlowJS, isError as isErrorJS } from "@build/index";
 import { booleanFlow as BooleanFlowESM, isError as isErrorESM } from "@build/index.cjs";
 
 const testBooleanFlow = (booleanFlow: typeof BooleanFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
@@ -80,46 +84,6 @@ const testBooleanFlow = (booleanFlow: typeof BooleanFlow, isError: typeof isErro
         expect(flowFalse.notEqual(true).get()).toBe(true);
         expect(flowFalse.notEqual(false).get()).toBe(false);
       });
-
-      it("greaterThan: 불리언 값이 다른 값보다 큰지 확인해야 합니다", () => {
-        const flowTrue = booleanFlow(true);
-        const flowFalse = booleanFlow(false);
-
-        expect(flowTrue.greaterThan(false).get()).toBe(true);
-        expect(flowTrue.greaterThan(true).get()).toBe(false);
-        expect(flowFalse.greaterThan(true).get()).toBe(false);
-        expect(flowFalse.greaterThan(false).get()).toBe(false);
-      });
-
-      it("lessThan: 불리언 값이 다른 값보다 작은지 확인해야 합니다", () => {
-        const flowTrue = booleanFlow(true);
-        const flowFalse = booleanFlow(false);
-
-        expect(flowTrue.lessThan(false).get()).toBe(false);
-        expect(flowTrue.lessThan(true).get()).toBe(false);
-        expect(flowFalse.lessThan(true).get()).toBe(true);
-        expect(flowFalse.lessThan(false).get()).toBe(false);
-      });
-
-      it("greaterThanOrEqual: 불리언 값이 다른 값보다 크거나 같은지 확인해야 합니다", () => {
-        const flowTrue = booleanFlow(true);
-        const flowFalse = booleanFlow(false);
-
-        expect(flowTrue.greaterThanOrEqual(false).get()).toBe(true);
-        expect(flowTrue.greaterThanOrEqual(true).get()).toBe(true);
-        expect(flowFalse.greaterThanOrEqual(true).get()).toBe(false);
-        expect(flowFalse.greaterThanOrEqual(false).get()).toBe(true);
-      });
-
-      it("lessThanOrEqual: 불리언 값이 다른 값보다 작거나 같은지 확인해야 합니다", () => {
-        const flowTrue = booleanFlow(true);
-        const flowFalse = booleanFlow(false);
-
-        expect(flowTrue.lessThanOrEqual(false).get()).toBe(false);
-        expect(flowTrue.lessThanOrEqual(true).get()).toBe(true);
-        expect(flowFalse.lessThanOrEqual(true).get()).toBe(true);
-        expect(flowFalse.lessThanOrEqual(false).get()).toBe(true);
-      });
     });
 
     describe("타입 변환 메서드", () => {
@@ -150,5 +114,5 @@ const testBooleanFlow = (booleanFlow: typeof BooleanFlow, isError: typeof isErro
   });
 };
 
-testBooleanFlow(BooleanFlowJS as typeof BooleanFlow, isErrorJS);
-testBooleanFlow(BooleanFlowESM as typeof BooleanFlow, isErrorESM);
+testBooleanFlow(BooleanFlowJS as unknown as typeof BooleanFlow, isErrorJS);
+testBooleanFlow(BooleanFlowESM as unknown as typeof BooleanFlow, isErrorESM);
