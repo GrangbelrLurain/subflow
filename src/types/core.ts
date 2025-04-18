@@ -23,6 +23,6 @@ export type SafeFlow<T> = {
 
 export type DefaultExtensions<T> = SafeFlow<T> | ErrorFlow<T>;
 
-export type FlowReturn<T> = DefaultExtensions<T>;
+export type Flow<T> = DefaultExtensions<T>;
 
-export type Flow<T> = (value: T) => FlowReturn<T>;
+export type CreateFlow<T> = (value: T) => Flow<T>;

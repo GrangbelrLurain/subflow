@@ -1,6 +1,6 @@
 // test/createMonad.test.ts
 import { describe, it, expect } from "vitest";
-import { createFlow as CreateFlow, safer as Safer, FlowReturn } from "@subflow/index";
+import { createFlow as CreateFlow, safer as Safer, Flow } from "@subflow/index";
 import { createFlow as CreateFlowJS, safer as SaferJS, isError as isErrorJS, errorFlow as ErrorFlowJS } from "@build/index";
 import { createFlow as CreateFlowESM, safer as SaferESM, isError as isErrorESM, errorFlow as ErrorFlowESM } from "@build/index.cjs";
 import { errorFlow as ErrorFlow } from "@subflow/error";
@@ -72,7 +72,7 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
       it("확장 메서드를 적용해야 합니다", () => {
         const value = "test value";
         const extensions = {
-          customMethod(this: FlowReturn<string>) {
+          customMethod(this: Flow<string>) {
             return this.get().length;
           },
         };
@@ -94,7 +94,7 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
         const value = 123;
 
         const extensions = {
-          customMethod(this: FlowReturn<string>) {
+          customMethod(this: Flow<string>) {
             return this.get();
           },
         };
