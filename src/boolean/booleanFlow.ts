@@ -1,46 +1,49 @@
-import { createFlow } from "@subflow/core/createFlow";
+import { createFlow, CUSTOM_METHODS } from "@subflow/core/createFlow";
 import { numberFlow } from "@subflow/number";
 import { stringFlow } from "@subflow/string";
-import { Methods, Flow } from "@subflow/types/core";
+import { Methods, SafeFlow } from "@subflow/types/core";
 import { BooleanFlowMethods } from "@subflow/types/flows";
+import { Flow } from "@subflow/types/core";
 import { errorFlow } from "@subflow/error";
+import { FLOW_TYPE } from "@subflow/meta/flowType";
 
-export const booleanFlow = <E extends Methods<boolean>>(value: boolean, methods?: E) => {
-  const defaultMethods: BooleanFlowMethods = {
-    not(this: Flow<boolean>) {
-      return booleanFlow(!this.get(), methods);
-    },
-    and(this: Flow<boolean>, other: boolean) {
-      return booleanFlow(this.get() && other, methods);
-    },
-    or(this: Flow<boolean>, other: boolean) {
-      return booleanFlow(this.get() || other, methods);
-    },
-    nor(this: Flow<boolean>, other: boolean) {
-      return booleanFlow(!this.get() || !other, methods);
-    },
-    xor(this: Flow<boolean>, other: boolean) {
-      return booleanFlow(this.get() !== other, methods);
-    },
-    notEqual(this: Flow<boolean>, other: boolean) {
-      return booleanFlow(this.get() !== other, methods);
-    },
-    equal(this: Flow<boolean>, other: boolean) {
-      return booleanFlow(this.get() === other, methods);
-    },
-    flowString(this: Flow<boolean>) {
-      return stringFlow(this.get().toString());
-    },
-    flowNumber(this: Flow<boolean>) {
-      return numberFlow(this.get() ? 1 : 0);
-    },
-    ...(methods || {}),
-  };
+export const booleanMethods: BooleanFlowMethods = {
+  [FLOW_TYPE]: "boolean",
+  not(this: SafeFlow<boolean>) {
+    return booleanFlow(!this.get(), this[CUSTOM_METHODS]);
+  },
+  and(this: SafeFlow<boolean>, other: boolean) {
+    return booleanFlow(this.get() && other, this[CUSTOM_METHODS]);
+  },
+  or(this: SafeFlow<boolean>, other: boolean) {
+    return booleanFlow(this.get() || other, this[CUSTOM_METHODS]);
+  },
+  nor(this: SafeFlow<boolean>, other: boolean) {
+    return booleanFlow(!this.get() || !other, this[CUSTOM_METHODS]);
+  },
+  xor(this: SafeFlow<boolean>, other: boolean) {
+    return booleanFlow(this.get() !== other, this[CUSTOM_METHODS]);
+  },
+  notEqual(this: SafeFlow<boolean>, other: boolean) {
+    return booleanFlow(this.get() !== other, this[CUSTOM_METHODS]);
+  },
+  equal(this: SafeFlow<boolean>, other: boolean) {
+    return booleanFlow(this.get() === other, this[CUSTOM_METHODS]);
+  },
+  flowString(this: SafeFlow<boolean>) {
+    return stringFlow(this.get().toString());
+  },
+  flowNumber(this: SafeFlow<boolean>) {
+    return numberFlow(this.get() ? 1 : 0);
+  },
+};
 
-  const guard = booleanFlow(typeof value === "boolean");
-
-  if (guard.not().get()) {
-    return errorFlow<boolean, E & typeof defaultMethods>({
+export const booleanFlow = <E extends Methods<boolean>>(
+  value: boolean,
+  methods?: E
+) => {
+  if (typeof value !== "boolean") {
+    return errorFlow<boolean, E & typeof booleanMethods>({
       type: "boolean",
       value,
       message: "Value must be a boolean",
@@ -48,7 +51,9 @@ export const booleanFlow = <E extends Methods<boolean>>(value: boolean, methods?
     });
   }
 
-  return createFlow("boolean", value, defaultMethods);
+  return createFlow("boolean", value, methods) as Flow<boolean> &
+    E &
+    BooleanFlowMethods;
 };
 
 export default booleanFlow;

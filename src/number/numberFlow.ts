@@ -4,8 +4,10 @@ import { Methods, SafeFlow } from "@subflow/types/core";
 import { NumberFlowMethods } from "@subflow/types/flows";
 import { errorFlow } from "@subflow/error";
 import { booleanFlow } from "@subflow/boolean";
+import { FLOW_TYPE } from "@subflow/meta/flowType";
 
-const numberMethods: NumberFlowMethods = {
+export const numberMethods: NumberFlowMethods = {
+  [FLOW_TYPE]: "number",
   add(this: SafeFlow<number>, num: number) {
     return numberFlow(this.get() + num);
   },
@@ -78,7 +80,11 @@ const numberMethods: NumberFlowMethods = {
   flowBoolean(this: SafeFlow<number>) {
     return booleanFlow(this.get() !== 0);
   },
-  flowLocaleString(this: SafeFlow<number>, locales: string | string[], options?: Intl.NumberFormatOptions) {
+  flowLocaleString(
+    this: SafeFlow<number>,
+    locales: string | string[],
+    options?: Intl.NumberFormatOptions
+  ) {
     return stringFlow(this.get().toLocaleString(locales, options));
   },
   flowString(this: SafeFlow<number>, radix?: number) {
@@ -86,10 +92,11 @@ const numberMethods: NumberFlowMethods = {
   },
 };
 
-export const numberFlow = <M extends Methods<number>>(value: number, methods?: M) => {
-  const guard = booleanFlow(typeof value === "number");
-
-  if (guard.not().get()) {
+export const numberFlow = <M extends Methods<number>>(
+  value: number,
+  methods?: M
+) => {
+  if (typeof value !== "number") {
     return errorFlow<number, M & typeof numberMethods>({
       type: "number",
       value,
@@ -98,5 +105,5 @@ export const numberFlow = <M extends Methods<number>>(value: number, methods?: M
     });
   }
 
-  return createFlow("number", value, numberMethods);
+  return createFlow("number", value, methods);
 };
