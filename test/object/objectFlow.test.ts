@@ -1,9 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { objectFlow as ObjectFlow } from "@subflow/index";
-import { objectFlow as ObjectFlowJS, isError as isErrorJS } from "@build/index";
-import { objectFlow as ObjectFlowESM, isError as isErrorESM } from "@build/index.cjs";
+import {
+  objectFlow as ObjectFlowJS,
+  isError as isErrorJS,
+} from "@build/index.cjs.js";
+import {
+  objectFlow as ObjectFlowESM,
+  isError as isErrorESM,
+} from "@build/index.es.js";
 
-const testObjectFlow = (objectFlow: typeof ObjectFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
+const testObjectFlow = (
+  objectFlow: typeof ObjectFlowJS | typeof ObjectFlowESM,
+  isError: typeof isErrorESM | typeof isErrorJS
+) => {
   describe("objectFlow", () => {
     describe("기본 기능", () => {
       it("객체 값을 가진 flow를 생성해야 합니다", () => {
@@ -45,7 +53,7 @@ const testObjectFlow = (objectFlow: typeof ObjectFlow, isError: typeof isErrorES
         const obj = { name: "John", age: 30 };
         const flow = objectFlow(obj);
         expect(flow.has("name").get()).toBe(true);
-        expect(flow.has("address").get()).toBe(false);
+        expect(flow.has("address" as never).get()).toBe(false);
       });
 
       it("set: 객체에 새로운 키-값 쌍을 추가해야 합니다", () => {
@@ -83,7 +91,7 @@ const testObjectFlow = (objectFlow: typeof ObjectFlow, isError: typeof isErrorES
       it("여러 메서드를 체이닝할 수 있어야 합니다", () => {
         const obj = { name: "John", age: 30 };
         const flow = objectFlow(obj);
-        const result = flow.set("address", "Seoul").delete("age");
+        const result = flow.set("address", "Seoul").delete("age" as never);
         expect(result.get()).toEqual({ name: "John", address: "Seoul" });
       });
     });
@@ -107,5 +115,5 @@ const testObjectFlow = (objectFlow: typeof ObjectFlow, isError: typeof isErrorES
   });
 };
 
-testObjectFlow(ObjectFlowJS as unknown as typeof ObjectFlow, isErrorJS);
-testObjectFlow(ObjectFlowESM as unknown as typeof ObjectFlow, isErrorESM);
+testObjectFlow(ObjectFlowJS, isErrorJS);
+testObjectFlow(ObjectFlowESM, isErrorESM);

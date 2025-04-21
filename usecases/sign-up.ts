@@ -1,4 +1,4 @@
-import { stringFlow, booleanFlow, errorFlow, isError, arrayFlow } from "subflow";
+import { stringFlow, booleanFlow, errorFlow, isError } from "subflow";
 
 type SignUpInput = {
   email: string;
@@ -30,19 +30,35 @@ const validateSignUp = (input: SignUpInput) => {
   }
 
   if (email.includes("@").not().get()) {
-    return errorFlow({ message: "Invalid email format", value: email.get(), type: "string" });
+    return errorFlow({
+      message: "Invalid email format",
+      value: email.get(),
+      type: "string",
+    });
   }
 
   if (password.length().lessThan(8).get()) {
-    return errorFlow({ message: "Password too short", value: password.get(), type: "string" });
+    return errorFlow({
+      message: "Password too short",
+      value: password.get(),
+      type: "string",
+    });
   }
 
   if (password.notEqual(confirmPassword.get()).get()) {
-    return errorFlow({ message: "Passwords do not match", value: confirmPassword.get(), type: "string" });
+    return errorFlow({
+      message: "Passwords do not match",
+      value: confirmPassword.get(),
+      type: "string",
+    });
   }
 
   if (agreed.not().get()) {
-    return errorFlow({ message: "You must agree to terms", value: agreed.get(), type: "boolean" });
+    return errorFlow({
+      message: "You must agree to terms",
+      value: agreed.get(),
+      type: "boolean",
+    });
   }
 
   return {
@@ -52,9 +68,12 @@ const validateSignUp = (input: SignUpInput) => {
   };
 };
 
-const result = validateSignUp({ email: "test@12345.com", password: "password", confirmPassword: "password", agreeToTerms: true });
-
-console.log(arrayFlow([1, 2, 3]));
+const result = validateSignUp({
+  email: "test@12345.com",
+  password: "password",
+  confirmPassword: "password",
+  agreeToTerms: true,
+});
 
 if (isError(result)) {
   console.log(result.getError());

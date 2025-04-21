@@ -1,9 +1,17 @@
-import { stringFlow as StringFlow } from "@subflow/string";
-import { stringFlow as StringFlowJS, isError as isErrorJS } from "@build/index";
-import { stringFlow as StringFlowESM, isError as isErrorESM } from "@build/index.cjs";
+import {
+  stringFlow as StringFlowJS,
+  isError as isErrorJS,
+} from "@build/index.cjs.js";
+import {
+  stringFlow as StringFlowESM,
+  isError as isErrorESM,
+} from "@build/index.es.js";
 import { describe, it, expect } from "vitest";
 
-const testStringFlow = (stringFlow: typeof StringFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
+const testStringFlow = (
+  stringFlow: typeof StringFlowJS | typeof StringFlowESM,
+  isError: typeof isErrorESM | typeof isErrorJS
+) => {
   describe("stringFlow", () => {
     describe("기본 기능", () => {
       it("문자열 값을 가진 flow를 생성해야 합니다", () => {
@@ -165,5 +173,5 @@ const testStringFlow = (stringFlow: typeof StringFlow, isError: typeof isErrorES
   });
 };
 
-testStringFlow(StringFlowJS as unknown as typeof StringFlow, isErrorJS);
-testStringFlow(StringFlowESM as unknown as typeof StringFlow, isErrorESM);
+testStringFlow(StringFlowJS, isErrorJS);
+testStringFlow(StringFlowESM, isErrorESM);

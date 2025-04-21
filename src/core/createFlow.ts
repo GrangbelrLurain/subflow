@@ -19,7 +19,10 @@ const BaseMethods = Object.freeze({
   },
 });
 
-const defaultMethodsCache: Record<SafeFlowType, SwitchMethods<SafeFlowType> & typeof BaseMethods> = {
+const defaultMethodsCache: Record<
+  SafeFlowType,
+  SwitchMethods<SafeFlowType> & typeof BaseMethods
+> = {
   number: Object.freeze({
     ...BaseMethods,
     ...numberMethods,
@@ -36,28 +39,41 @@ const defaultMethodsCache: Record<SafeFlowType, SwitchMethods<SafeFlowType> & ty
     ...BaseMethods,
     ...bigIntMethods,
   }),
-  object: Object.freeze({
-    ...BaseMethods,
-    ...objectMethods,
-  }),
   array: Object.freeze({
     ...BaseMethods,
     ...arrayMethods,
+  }),
+  object: Object.freeze({
+    ...BaseMethods,
+    ...objectMethods,
   }),
 };
 
 const customMethodCache = new WeakMap<object, Record<string, any>>();
 
-const mergeMethods = <T, F extends SafeFlowType, M extends Methods<T>>(flowType: F, customMethods?: M): typeof BaseMethods & SwitchMethods<F> & M => {
-  if (!customMethods) return defaultMethodsCache[flowType] as typeof BaseMethods & SwitchMethods<F> & M;
-  if (customMethodCache.has(customMethods)) return customMethodCache.get(customMethods)! as typeof BaseMethods & SwitchMethods<F> & M;
+const mergeMethods = <T, F extends SafeFlowType, M extends Methods<T>>(
+  flowType: F,
+  customMethods?: M
+): typeof BaseMethods & SwitchMethods<F> & M => {
+  if (!customMethods)
+    return defaultMethodsCache[flowType] as typeof BaseMethods &
+      SwitchMethods<F> &
+      M;
+  if (customMethodCache.has(customMethods))
+    return customMethodCache.get(customMethods)! as typeof BaseMethods &
+      SwitchMethods<F> &
+      M;
   const merged = { ...defaultMethodsCache[flowType], ...customMethods };
   const frozen = Object.freeze(merged);
   customMethodCache.set(customMethods, frozen);
   return frozen as typeof BaseMethods & SwitchMethods<F> & M;
 };
 
-export const createFlow = <F extends SafeFlowType, T, M extends Methods<T>>(flowType: F, init: T, methods?: M) => {
+export const createFlow = <F extends SafeFlowType, T, M extends Methods<T>>(
+  flowType: F,
+  init: T,
+  methods?: M
+) => {
   const allMethods = mergeMethods<T, F, M>(flowType, methods);
   const flow = Object.freeze({
     ...allMethods,

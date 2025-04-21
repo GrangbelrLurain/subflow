@@ -1,10 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { numberFlow as NumberFlow } from "@subflow/number";
-import { numberFlow as NumberFlowJS } from "@build/index";
-import { numberFlow as NumberFlowESM } from "@build/index.cjs";
-import { isError } from "@subflow/error";
+import {
+  numberFlow as NumberFlowJS,
+  isError as isErrorJS,
+} from "@build/index.cjs.js";
+import {
+  numberFlow as NumberFlowESM,
+  isError as isErrorESM,
+} from "@build/index.es.js";
 
-const testNumberFlow = (numberFlow: typeof NumberFlow) => {
+const testNumberFlow = (
+  numberFlow: typeof NumberFlowJS | typeof NumberFlowESM,
+  isError: typeof isErrorESM | typeof isErrorJS
+) => {
   describe("numberFlow", () => {
     describe("기본 기능", () => {
       it("숫자 값을 가진 flow를 생성해야 합니다", () => {
@@ -144,5 +151,5 @@ const testNumberFlow = (numberFlow: typeof NumberFlow) => {
   });
 };
 
-testNumberFlow(NumberFlowJS as unknown as typeof NumberFlow);
-testNumberFlow(NumberFlowESM as unknown as typeof NumberFlow);
+testNumberFlow(NumberFlowJS, isErrorJS);
+testNumberFlow(NumberFlowESM, isErrorESM);

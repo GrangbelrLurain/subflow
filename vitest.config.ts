@@ -9,8 +9,8 @@ export default defineConfig({
     ui: true,
     coverage: {
       reporter: ["text", "html"],
-      include: ["dist/**/*.{cjs,mjs,ts,cts}"],
-      exclude: ["**/__tests__/**", "**/*.test.ts", "src/*"],
+      include: ["dist/**/*.{js,ts}"],
+      exclude: ["**/__tests__/**", "**/*.test.ts", "src/**", "dist/types/**"],
       reportsDirectory: "./coverage",
     },
   },

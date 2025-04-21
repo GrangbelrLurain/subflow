@@ -1,10 +1,18 @@
 import { describe, it, expect } from "vitest";
-import { arrayFlow as ArrayFlow } from "@subflow/array";
 
-import { arrayFlow as ArrayFlowJS, isError as isErrorJS } from "@build/index.";
-import { arrayFlow as ArrayFlowESM, isError as isErrorESM } from "@build/index.cjs";
+import {
+  arrayFlow as ArrayFlowJS,
+  isError as isErrorJS,
+} from "@build/index.cjs.js";
+import {
+  arrayFlow as ArrayFlowESM,
+  isError as isErrorESM,
+} from "@build/index.es.js";
 
-const testArrayFlow = (arrayFlow: typeof ArrayFlow, isError: typeof isErrorESM | typeof isErrorJS) => {
+const testArrayFlow = (
+  arrayFlow: typeof ArrayFlowJS | typeof ArrayFlowESM,
+  isError: typeof isErrorESM | typeof isErrorJS
+) => {
   describe("arrayFlow", () => {
     describe("기본 기능", () => {
       it("배열 값을 가진 flow를 생성해야 합니다", () => {
@@ -51,7 +59,7 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow, isError: typeof isErrorESM |
       it("unshift: 배열의 시작 부분에 요소를 추가해야 합니다", () => {
         const arr = [1, 2, 3];
         const flow = arrayFlow(arr);
-        const newFlow = flow.unshift([0, -1]);
+        const newFlow = flow.unshift(...[0, -1]);
         expect(newFlow.get()).toEqual([0, -1, 1, 2, 3]);
         // 원본 배열은 변경되지 않아야 합니다
         expect(flow.get()).toEqual([1, 2, 3]);
@@ -113,7 +121,7 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow, isError: typeof isErrorESM |
       it("concat: 배열을 결합해야 합니다", () => {
         const arr = [1, 2, 3];
         const flow = arrayFlow(arr);
-        const newFlow = flow.concat([4, 5], [6, 7]);
+        const newFlow = flow.concat(...[4, 5], ...[6, 7]);
         expect(newFlow.get()).toEqual([1, 2, 3, 4, 5, 6, 7]);
         // 원본 배열은 변경되지 않아야 합니다
         expect(flow.get()).toEqual([1, 2, 3]);
@@ -315,5 +323,5 @@ const testArrayFlow = (arrayFlow: typeof ArrayFlow, isError: typeof isErrorESM |
   });
 };
 
-testArrayFlow(ArrayFlowJS as unknown as typeof ArrayFlow, isErrorJS);
-testArrayFlow(ArrayFlowESM as unknown as typeof ArrayFlow, isErrorESM);
+testArrayFlow(ArrayFlowJS, isErrorJS);
+testArrayFlow(ArrayFlowESM, isErrorESM);

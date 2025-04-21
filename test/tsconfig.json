@@ -5,7 +5,8 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "lib": ["ESNext", "DOM"],
-    "declaration": true
+    "declaration": true,
+    "types": ["./index.d.ts"]
   },
   "include": ["**/*.test.ts"]
 }
