@@ -4,6 +4,10 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "lib": ["ESNext", "DOM"],
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "composite": false,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -15,5 +19,5 @@
     }
   },
   "include": ["src", "test"],
-  "exclude": ["node_modules", "dist", "coverage"]
+  "exclude": ["node_modules", "coverage"]
 }

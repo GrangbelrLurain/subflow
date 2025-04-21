@@ -1,5 +1,5 @@
 import { Methods } from "@subflow/types/core";
-import { FlowErrorParams, ErrorFlow } from "@subflow/types/error";
+import { FlowErrorParams, ErrorFlow } from "@subflow/types/core";
 import { ErrorManager } from "./errorManager";
 import { FLOW_TYPE, isErrorFlow } from "@subflow/meta/flowType";
 

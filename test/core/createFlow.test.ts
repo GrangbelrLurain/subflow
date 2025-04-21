@@ -1,40 +1,35 @@
 // test/createMonad.test.ts
 import { describe, it, expect } from "vitest";
-import { createFlow as CreateFlow, safer as Safer, FlowReturn } from "@subflow/index";
-import { createFlow as CreateFlowJS, safer as SaferJS, isError as isErrorJS, errorFlow as ErrorFlowJS } from "@build/index";
-import { createFlow as CreateFlowESM, safer as SaferESM, isError as isErrorESM, errorFlow as ErrorFlowESM } from "@build/index.cjs";
-import { errorFlow as ErrorFlow } from "@subflow/error";
+import {
+  createFlow as CreateFlowJS,
+  isError as isErrorJS,
+  errorFlow as ErrorFlowJS,
+} from "@build/index.cjs.js";
+import {
+  createFlow as CreateFlowESM,
+  isError as isErrorESM,
+  errorFlow as ErrorFlowESM,
+} from "@build/index.es.js";
+import { Flow } from "@build/types";
 
-const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isError: typeof isErrorESM | typeof isErrorJS, errorFlow: typeof ErrorFlow) => {
+const testCreateFlow = (
+  createFlow: typeof CreateFlowJS | typeof CreateFlowESM,
+  isError: typeof isErrorESM | typeof isErrorJS,
+  errorFlow: typeof ErrorFlowJS | typeof ErrorFlowESM
+) => {
   describe("createFlow", () => {
     describe("기본 기능", () => {
       it("값을 가진 flow를 생성해야 합니다", () => {
         const value = "test value";
-        const init = safer(value, (value: string): string => value, {
-          type: "string",
-          value,
-          message: "Value error",
-          code: "TEST_ERROR",
-          timestamp: Date.now(),
-          traceId: "traceId",
-        });
 
-        const flow = createFlow("string", init, {});
+        const flow = createFlow("string", value, {});
         expect(flow.get()).toBe("test value");
       });
 
       it("오류가 없을 때 isError가 false를 반환해야 합니다", () => {
         const value = "test value";
-        const init = safer(value, (value: string): string => value, {
-          type: "string",
-          value,
-          message: "Value error",
-          code: "TEST_ERROR",
-          timestamp: Date.now(),
-          traceId: "traceId",
-        });
 
-        const flow = createFlow("string", init, {});
+        const flow = createFlow("string", value, {});
         expect(isError(flow)).toBe(false);
       });
 
@@ -54,16 +49,8 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
 
       it("오류가 없을 때 getError가 undefined를 반환해야 합니다", () => {
         const value = "test value";
-        const init = safer(value, (value: string): string => value, {
-          type: "string",
-          value,
-          message: "Value error",
-          code: "TEST_ERROR",
-          timestamp: Date.now(),
-          traceId: "traceId",
-        });
 
-        const flow = createFlow("string", init, {});
+        const flow = createFlow("string", value, {});
         expect(flow.getError()).toBe(undefined);
       });
     });
@@ -72,21 +59,12 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
       it("확장 메서드를 적용해야 합니다", () => {
         const value = "test value";
         const extensions = {
-          customMethod(this: FlowReturn<string>) {
+          customMethod(this: Flow<string>) {
             return this.get().length;
           },
         };
 
-        const init = safer(value, (value: string): string => value, {
-          type: "string",
-          value,
-          message: "Value error",
-          code: "TEST_ERROR",
-          timestamp: Date.now(),
-          traceId: "traceId",
-        });
-
-        const flow = createFlow("string", init, extensions as any);
+        const flow = createFlow("string", value, extensions as any);
         expect(flow.customMethod()).toBe(10); // 'test value'의 길이
       });
 
@@ -94,7 +72,7 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
         const value = 123;
 
         const extensions = {
-          customMethod(this: FlowReturn<string>) {
+          customMethod(this: Flow<string>) {
             return this.get();
           },
         };
@@ -114,16 +92,8 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
     describe("불변성", () => {
       it("flow 값이 불변해야 합니다", () => {
         const value = "test value";
-        const init = safer(value, (value: string): string => value, {
-          type: "string",
-          value,
-          message: "Value error",
-          code: "TEST_ERROR",
-          timestamp: Date.now(),
-          traceId: "traceId",
-        });
 
-        const flow = createFlow("string", init, {});
+        const flow = createFlow("string", value, {});
 
         // flow 내부의 _value 속성은 writable: false로 설정되어 있음
         try {
@@ -142,5 +112,5 @@ const testCreateFlow = (createFlow: typeof CreateFlow, safer: typeof Safer, isEr
   });
 };
 
-testCreateFlow(CreateFlowJS as unknown as typeof CreateFlow, SaferJS as unknown as typeof Safer, isErrorJS, ErrorFlowJS as unknown as typeof ErrorFlow);
-testCreateFlow(CreateFlowESM as unknown as typeof CreateFlow, SaferESM as unknown as typeof Safer, isErrorESM, ErrorFlowESM as unknown as typeof ErrorFlow);
+testCreateFlow(CreateFlowJS, isErrorJS, ErrorFlowJS);
+testCreateFlow(CreateFlowESM, isErrorESM, ErrorFlowESM);
