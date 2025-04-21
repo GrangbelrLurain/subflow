@@ -1,13 +1,13 @@
 import { Methods } from "@subflow/types/core";
 import { SafeFlowType } from "@subflow/types/meta";
-import { FLOW_TYPE } from "@subflow/meta/flowType";
+import { CUSTOM_METHODS, FLOW_TYPE, VALUE } from "@subflow/meta/flowType";
 import { numberMethods } from "@subflow/number";
 import { stringMethods } from "@subflow/string";
 import { booleanMethods } from "@subflow/boolean";
 import { SwitchMethods } from "@subflow/types";
-
-export const VALUE = Symbol("value");
-export const CUSTOM_METHODS = Symbol("customMethods");
+import { bigIntMethods } from "@subflow/bigint";
+import { objectMethods } from "@subflow/object";
+import { arrayMethods } from "@subflow/array";
 
 const BaseMethods = Object.freeze({
   isError: false,
@@ -19,58 +19,45 @@ const BaseMethods = Object.freeze({
   },
 });
 
-const defaultMethodsCache: Record<SafeFlowType, SwitchMethods<SafeFlowType>> = {
+const defaultMethodsCache: Record<SafeFlowType, SwitchMethods<SafeFlowType> & typeof BaseMethods> = {
   number: Object.freeze({
     ...BaseMethods,
     ...numberMethods,
-    [FLOW_TYPE]: "number",
   }),
   string: Object.freeze({
     ...BaseMethods,
     ...stringMethods,
-    [FLOW_TYPE]: "string",
   }),
   boolean: Object.freeze({
     ...BaseMethods,
     ...booleanMethods,
-    [FLOW_TYPE]: "boolean",
   }),
   bigint: Object.freeze({
     ...BaseMethods,
-    [FLOW_TYPE]: "bigint",
+    ...bigIntMethods,
   }),
   object: Object.freeze({
     ...BaseMethods,
     ...objectMethods,
-    [FLOW_TYPE]: "object",
   }),
   array: Object.freeze({
     ...BaseMethods,
     ...arrayMethods,
-    [FLOW_TYPE]: "array",
   }),
 };
 
 const customMethodCache = new WeakMap<object, Record<string, any>>();
 
-const mergeMethods = <T, F extends SafeFlowType, M extends Methods<T>>(
-  flowType: F,
-  customMethods?: M
-) => {
-  if (!customMethods) return defaultMethodsCache[flowType];
-  if (customMethodCache.has(customMethods))
-    return customMethodCache.get(customMethods)!;
+const mergeMethods = <T, F extends SafeFlowType, M extends Methods<T>>(flowType: F, customMethods?: M): typeof BaseMethods & SwitchMethods<F> & M => {
+  if (!customMethods) return defaultMethodsCache[flowType] as typeof BaseMethods & SwitchMethods<F> & M;
+  if (customMethodCache.has(customMethods)) return customMethodCache.get(customMethods)! as typeof BaseMethods & SwitchMethods<F> & M;
   const merged = { ...defaultMethodsCache[flowType], ...customMethods };
   const frozen = Object.freeze(merged);
   customMethodCache.set(customMethods, frozen);
-  return frozen;
+  return frozen as typeof BaseMethods & SwitchMethods<F> & M;
 };
 
-export const createFlow = <F extends SafeFlowType, T, M extends Methods<T>>(
-  flowType: F,
-  init: T,
-  methods?: M
-) => {
+export const createFlow = <F extends SafeFlowType, T, M extends Methods<T>>(flowType: F, init: T, methods?: M) => {
   const allMethods = mergeMethods<T, F, M>(flowType, methods);
   const flow = Object.freeze({
     ...allMethods,

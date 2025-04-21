@@ -1,31 +1,33 @@
-import { VALUE, CUSTOM_METHODS } from "@subflow/core";
-import { FLOW_TYPE } from "@subflow/meta/flowType";
-import { ErrorFlow, FlowType } from "@subflow/types";
-/**
- * 단일 확장 메서드의 타입 정의
- * @template T 확장 메서드가 적용될 객체 타입
- * @template Args 메서드 인자들의 타입
- * @template Return 메서드 반환값의 타입
- */
-export type Method<T, Args extends any[] = any[], Return = any> = (
-  this: DefaultExtensions<T>,
-  ...args: Args
-) => Return;
+import { CUSTOM_METHODS, FLOW_TYPE, VALUE } from "@subflow/meta/flowType";
+import { FlowType } from "@subflow/types";
 
-/**
- * 확장 메서드들의 컬렉션 타입 정의
- * @template T 확장 메서드들이 적용될 객체 타입
- * @template EM 확장 메서드들의 맵 타입 (선택적)
- */
-export type Methods<
-  T,
-  EM extends Record<string, Method<T>> = Record<string, Method<T>>
-> = EM;
+export type Method<T, Args extends any[] = any[], Return = any> = (this: DefaultExtensions<T>, ...args: Args) => Return;
+
+export type Methods<T, EM extends Record<string, Method<T>> | { [FLOW_TYPE]: FlowType } = Record<string, Method<T>>> = EM;
+
+export interface FlowErrorParams<T> {
+  readonly type: FlowType;
+  readonly value: T;
+  readonly message: string;
+  readonly code?: string;
+  readonly timestamp?: number;
+  readonly traceId?: string;
+  readonly stack?: string;
+  readonly cause?: Error;
+}
+
+export type ErrorFlow<T> = {
+  [FLOW_TYPE]: Extract<FlowType, "error">;
+  [VALUE]: T;
+  [CUSTOM_METHODS]?: Methods<T>;
+  get: () => T;
+  getError: () => FlowErrorParams<T>;
+};
 
 export type SafeFlow<T> = {
   [FLOW_TYPE]: Exclude<FlowType, "error">;
   [VALUE]: T;
-  [CUSTOM_METHODS]: Methods<T>;
+  [CUSTOM_METHODS]?: Methods<T>;
   get: () => T;
   getError: () => undefined;
 };

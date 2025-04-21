@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { arrayFlow as ArrayFlow } from "@subflow/array";
 
-import { arrayFlow as ArrayFlowJS, isError as isErrorJS } from "@build/index";
+import { arrayFlow as ArrayFlowJS, isError as isErrorJS } from "@build/index.";
 import { arrayFlow as ArrayFlowESM, isError as isErrorESM } from "@build/index.cjs";
 
 const testArrayFlow = (arrayFlow: typeof ArrayFlow, isError: typeof isErrorESM | typeof isErrorJS) => {

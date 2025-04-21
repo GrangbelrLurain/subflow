@@ -1,4 +1,4 @@
-import { FlowErrorParams } from "@subflow/types/error";
+import { FlowErrorParams } from "@subflow/types";
 
 export class ErrorManager {
   private static errors: FlowErrorParams<any>[] = [];

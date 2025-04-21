@@ -9,14 +9,14 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.es.js"
     }
   },
   "scripts": {
-    "build": "tsup",
-    "build:watch": "tsup src/index.ts  --format cjs,esm --dts --watch",
-    "dev": "tsup src/index.ts --watch",
+    "build": "vite build --config vite.build.config.ts && tsc --emitDeclarationOnly --outDir dist",
+    "build:watch": "vite build --watch",
+    "dev": "vite",
     "test": "vitest --ui",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",

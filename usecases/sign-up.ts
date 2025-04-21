@@ -1,4 +1,4 @@
-import { stringFlow, booleanFlow, errorFlow, isError } from "subflow";
+import { stringFlow, booleanFlow, errorFlow, isError, arrayFlow } from "subflow";
 
 type SignUpInput = {
   email: string;
@@ -53,6 +53,8 @@ const validateSignUp = (input: SignUpInput) => {
 };
 
 const result = validateSignUp({ email: "test@12345.com", password: "password", confirmPassword: "password", agreeToTerms: true });
+
+console.log(arrayFlow([1, 2, 3]));
 
 if (isError(result)) {
   console.log(result.getError());
